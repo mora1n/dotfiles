@@ -1,7 +1,6 @@
 # Terminal Configuration
 [terminal.shell]
-program = "/bin/sh"
-args = ["-c", "tmux attach || tmux new"]
+program = "/home/morain/.config/tmux/new-alacritty-session.sh"
 
 # Environment Variables
 [env]
