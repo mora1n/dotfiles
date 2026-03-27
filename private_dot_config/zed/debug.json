@@ -1,0 +1,55 @@
+[
+  {
+    "label": "Python: Current File (uv)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "program": "$ZED_RELATIVE_FILE",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "console": "integratedTerminal",
+    "justMyCode": true
+  },
+  {
+    "label": "Python: Current File with Args (uv, edit args)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "program": "$ZED_RELATIVE_FILE",
+    "args": ["--example", "value"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "console": "integratedTerminal",
+    "justMyCode": true
+  },
+  {
+    "label": "Python: Module (uv, edit module)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "module": "your_package.main",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "console": "integratedTerminal",
+    "justMyCode": true
+  },
+  {
+    "label": "FastAPI: uvicorn app (uv, edit import path)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "module": "uvicorn",
+    "args": ["your_package.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "console": "integratedTerminal",
+    "justMyCode": true
+  },
+  {
+    "label": "Pytest: Current File (uv)",
+    "adapter": "Debugpy",
+    "request": "launch",
+    "python": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "module": "pytest",
+    "args": ["$ZED_RELATIVE_FILE", "-q"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "console": "integratedTerminal",
+    "justMyCode": true
+  }
+]

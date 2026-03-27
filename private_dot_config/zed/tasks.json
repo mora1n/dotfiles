@@ -1,0 +1,67 @@
+[
+  {
+    "label": "Python: Run Current File (uv)",
+    "command": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "args": ["$ZED_RELATIVE_FILE"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system",
+    "save": "all"
+  },
+  {
+    "label": "Python: Run Current File with Args (uv, edit args)",
+    "command": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "args": ["$ZED_RELATIVE_FILE", "--example", "value"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system",
+    "save": "all"
+  },
+  {
+    "label": "FastAPI: Uvicorn App (uv, edit import path)",
+    "command": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "args": ["-m", "uvicorn", "your_package.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system",
+    "save": "all"
+  },
+  {
+    "label": "Pytest: Current File (uv)",
+    "command": "$ZED_WORKTREE_ROOT/.venv/bin/python",
+    "args": ["-m", "pytest", "$ZED_RELATIVE_FILE", "-q"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system",
+    "save": "all"
+  },
+  {
+    "label": "uv: Sync Project",
+    "command": "uv",
+    "args": ["sync"],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": false,
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "never",
+    "shell": "system",
+    "save": "all"
+  }
+]
