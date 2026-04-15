@@ -6,6 +6,11 @@ return {
   build = ':TSUpdate',
   event = utils.events.file,
   cmd = { 'TSUpdateSync', 'TSUpdate', 'TSInstall' },
+  keys = {
+    { '<CR>', mode = { 'n', 'x' }, desc = 'Init / increment selection' },
+    { '<Tab>', mode = 'x', desc = 'Increment selection scope' },
+    { '<S-Tab>', mode = 'x', desc = 'Decrement selection node' },
+  },
   enabled = utils.not_vscode,
   config = function()
     require('nvim-treesitter.configs').setup({

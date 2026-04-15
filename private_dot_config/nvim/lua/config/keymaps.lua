@@ -116,17 +116,17 @@ end
 
 if not is_vscode then
   -- Insert mode navigation and selection
-  vim.keymap.set('i', '<Home>', '<Esc>I')
-  vim.keymap.set('i', '<End>', '<Esc>A')
-  vim.keymap.set('i', '<S-Home>', '<Esc>v^')
-  vim.keymap.set('i', '<S-End>', '<Esc>v$')
-  vim.keymap.set('i', '<S-Left>', '<Esc>vh')
-  vim.keymap.set('i', '<S-Right>', '<Esc>vl')
-  vim.keymap.set('i', '<C-Left>', '<C-o>B')
-  vim.keymap.set('i', '<C-Right>', '<C-o>W')
-  vim.keymap.set('i', '<C-S-Left>', '<Esc>vb')
-  vim.keymap.set('i', '<C-S-Right>', '<Esc>vw')
-  vim.keymap.set('i', '<C-BS>', '<C-w>')
+  vim.keymap.set('i', '<Home>', '<Esc>I', { desc = 'Go to line start' })
+  vim.keymap.set('i', '<End>', '<Esc>A', { desc = 'Go to line end' })
+  vim.keymap.set('i', '<S-Home>', '<Esc>v^', { desc = 'Select to line start' })
+  vim.keymap.set('i', '<S-End>', '<Esc>v$', { desc = 'Select to line end' })
+  vim.keymap.set('i', '<S-Left>', '<Esc>vh', { desc = 'Select previous character' })
+  vim.keymap.set('i', '<S-Right>', '<Esc>vl', { desc = 'Select next character' })
+  vim.keymap.set('i', '<C-Left>', '<C-o>B', { desc = 'Move to previous word' })
+  vim.keymap.set('i', '<C-Right>', '<C-o>W', { desc = 'Move to next word' })
+  vim.keymap.set('i', '<C-S-Left>', '<Esc>vb', { desc = 'Select previous word' })
+  vim.keymap.set('i', '<C-S-Right>', '<Esc>vw', { desc = 'Select next word' })
+  vim.keymap.set('i', '<C-BS>', '<C-w>', { desc = 'Delete previous word' })
 
   -- Insert mode editing shortcuts
   vim.keymap.set('i', '<C-a>', '<Esc>ggVG', { desc = 'Select all' })
@@ -144,5 +144,5 @@ end
 if not is_vscode then
   -- Select mode behavior
   vim.keymap.set('s', '<BS>', '<BS>i', { desc = 'Delete selection and enter insert' })
-  vim.keymap.set('s', '<C-h>', '<BS>i')
+  vim.keymap.set('s', '<C-h>', '<BS>i', { desc = 'Delete selection and enter insert' })
 end

@@ -1,0 +1,26 @@
+# pack-refs with: peeled fully-peeled sorted 
+d1c641a0793744656d283f819215686f4069ee14 refs/remotes/origin/assert-refute-empty
+a7ed409f31da64806c503ed3157e29714d16f56e refs/remotes/origin/bundle-deps-for-tests
+697471b7a89d3ab38571f38c6c7c4b460d1f5e35 refs/remotes/origin/main
+697471b7a89d3ab38571f38c6c7c4b460d1f5e35 refs/remotes/origin/master
+7edd03d7555d3c4b7d768b1fb430f08aa67dc9f3 refs/remotes/origin/pr/gioele/49
+467046fd6170f7538ba73ba6262595e21bcabd7b refs/remotes/origin/simplify-travis
+adc1c7bacf66f7af8c201402fb1de69ab79cc4ae refs/remotes/origin/stdin
+f80edb877c959558731c3078e7c377e712d878ef refs/tags/v0.1.0
+^f861a59dc88c7b195c87618ef79a918f700319f6
+b02a5517a7bbf2894e9bc0b8b2baffd92fcbb6b2 refs/tags/v0.2.0
+^f59d97bd3cdff25d1689c855023d913bcffa1efc
+1aa0b5a53ad48cc857ee8f952debad83e7b1226e refs/tags/v0.3.0
+^9f88b4207da750093baabc4e3f41bf68f0dd3630
+08c40b485c08f82eb17e4d6e1ba052eee18cabd5 refs/tags/v2.0.0
+^d750c5a1b44bf6fc96726aea76f4621db5fd602f
+22612dc4c4332dac0e40491f1dc2ec93c59773f7 refs/tags/v2.1.0
+^78fa631d1370562d2cd4a1390989e706158e7bf0
+b42b20c5e2a09efda83efcae16c8b8414a56f4ca refs/tags/v2.2.0
+^d396ee3e943f7c1c058f3a1f4baddc12fab875ef
+e433114802f788e52e566b02f2332dc03ccc58bd refs/tags/v2.2.1
+1ba47b9e8267c75734e32125e8811dfa6e84bff6 refs/tags/v2.2.2
+0d8d61ee937625632dbd5a0f7930f4807678e850 refs/tags/v2.2.3
+^c6ccf04726f6714a3a20f571efac33d31d76c2ee
+123860c029685bc0a4150ed57ee97fc7f7cc9d31 refs/tags/v2.2.4
+^f1e9280eaae8f86cbe278a687e6ba755bc802c1a

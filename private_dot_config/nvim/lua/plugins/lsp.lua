@@ -14,18 +14,6 @@ return {
       local lsp_dir = vim.fn.stdpath('config') .. '/lsp'
       local capabilities = utils.get_lsp_capabilities()
 
-      -- Python virtual environment detection
-      local function find_python_venv(root_dir)
-        local venv_paths = { '.venv', 'venv', 'env' }
-        for _, venv in ipairs(venv_paths) do
-          local venv_python = root_dir .. '/' .. venv .. '/bin/python'
-          if vim.fn.filereadable(venv_python) == 1 then
-            return venv_python
-          end
-        end
-        return vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV .. '/bin/python' or 'python'
-      end
-
       -- Load ty.lua for Python LSP
       local ty_config = dofile(lsp_dir .. '/ty.lua')
       if ty_config and vim.fn.executable('ty') == 1 then

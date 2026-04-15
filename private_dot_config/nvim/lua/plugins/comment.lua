@@ -7,6 +7,9 @@ return {
     { 'gbc', mode = 'n', desc = 'Toggle block comment' },
     { 'gc', mode = { 'n', 'v' }, desc = 'Comment operator' },
     { 'gb', mode = { 'n', 'v' }, desc = 'Block comment operator' },
+    { 'gcO', mode = 'n', desc = 'Comment above' },
+    { 'gco', mode = 'n', desc = 'Comment below' },
+    { 'gcA', mode = 'n', desc = 'Comment end of line' },
     { '<C-_>', mode = { 'n', 'i', 'x' }, desc = 'Toggle comment (Ctrl+/)' },
   },
   opts = {

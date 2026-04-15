@@ -18,6 +18,7 @@ main() {
   show_fahrenheit=$(get_tmux_option "@dracula-show-fahrenheit" true)
   show_location=$(get_tmux_option "@dracula-show-location" true)
   fixed_location=$(get_tmux_option "@dracula-fixed-location")
+  weather_hide_errors=$(get_tmux_option "@dracula-weather-hide-errors" false)
   show_powerline=$(get_tmux_option "@dracula-show-powerline" false)
   transparent_powerline_bg=$(get_tmux_option "@dracula-transparent-powerline-bg" false)
   show_flags=$(get_tmux_option "@dracula-show-flags" false)
@@ -40,6 +41,9 @@ main() {
   show_empty_plugins=$(get_tmux_option "@dracula-show-empty-plugins" true)
   left_pad=$(get_tmux_option "@dracula-left-pad" " ")
   right_pad=$(get_tmux_option "@dracula-right-pad" " ")
+
+  if [ "$left_pad" = false ]; then left_pad=""; fi
+  if [ "$right_pad" = false ]; then right_pad=""; fi
 
   narrow_mode=$(get_tmux_option "@dracula-narrow-mode" false)
   if $narrow_mode; then
@@ -310,7 +314,7 @@ main() {
 
     elif [ $plugin = "weather" ]; then
       IFS=' ' read -r -a colors <<< $(get_tmux_option "@dracula-weather-colors" "orange dark_gray")
-      script="#($current_dir/weather_wrapper.sh $show_fahrenheit $show_location '$fixed_location')"
+      script="#($current_dir/weather_wrapper.sh $show_fahrenheit $show_location '$fixed_location' $weather_hide_errors)"
 
     elif [ $plugin = "time" ]; then
       IFS=' ' read -r -a colors <<< $(get_tmux_option "@dracula-time-colors" "dark_purple white")

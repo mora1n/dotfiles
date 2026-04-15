@@ -1,15 +1,15 @@
 # Neovim Configuration
 
-A highly optimized Neovim configuration based on Lua with native LSP support, modern completion, and extensive performance optimizations. Uses `lazy.nvim` for plugin management.
+A Lua-based Neovim configuration with modular plugins, built-in LSP integration, modern completion, and targeted performance tuning. Uses `lazy.nvim` for plugin management.
 
 ## Features
 
 - 🚀 **High Performance** - Optimized for fast startup (<50ms) and smooth editing
 - 🎨 **Transparent Background** - Beautiful Dracula theme with transparency
-- 💡 **Native LSP** - Uses `vim.lsp.config` and `vim.lsp.enable` (Neovim 0.11+)
+- 💡 **Built-in LSP** - LSP configuration lives under `lsp/` and is wired from `lua/plugins/lsp.lua`
 - ⚡ **Blink.cmp** - Rust-powered completion engine for superior performance
 - 📦 **Modular LSP** - LSP configurations in separate `lsp/` directory
-- 🔍 **Smart File Handling** - Automatic optimization for large files (>2MB)
+- 🔍 **Smart File Handling** - `faster.nvim` applies large-file optimizations (>1MB)
 - 📊 **Profiling Tools** - Built-in startup time analysis
 
 ## Installation
@@ -20,9 +20,10 @@ A highly optimized Neovim configuration based on Lua with native LSP support, mo
     ```
 
 2.  **Install dependencies:**
-    - Neovim 0.11+ (for native LSP support)
+    - Neovim 0.10+
     - A Nerd Font (for icons)
     - `ty` LSP server for Python (optional)
+    - `lua-language-server` for Lua LSP (optional)
 
 3.  **First run:**
     The configuration will automatically install `lazy.nvim` and all plugins on the first run.
@@ -36,7 +37,7 @@ The leader key is set to `<Space>`.
 ### Completion & LSP
 
 *   **[blink.cmp](https://github.com/saghen/blink.cmp):** Rust-powered completion engine.
-*   **Native LSP:** Uses Neovim's built-in LSP without nvim-lspconfig.
+*   **Built-in LSP:** Uses Neovim's built-in LSP without nvim-lspconfig.
 
 ### Navigation & Search
 
@@ -59,6 +60,7 @@ The leader key is set to `<Space>`.
 *   **[nvim-surround](https://github.com/kylechui/nvim-surround):** Manage surrounding pairs.
 *   **[vim-sleuth](https://github.com/tpope/vim-sleuth):** Auto-detect indentation.
 *   **[vim-python-pep8-indent](https://github.com/Vimjas/vim-python-pep8-indent):** PEP8 indentation for Python.
+*   **EditorConfig:** Uses Neovim's built-in EditorConfig support (0.9+), not an external plugin.
 
 ### UI
 
@@ -70,11 +72,11 @@ The leader key is set to `<Space>`.
 
 *   **[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter):** Syntax highlighting and parsing.
     *   **Parsers:** `bash`, `c`, `cpp`, `css`, `go`, `gomod`, `html`, `javascript`, `json`, `jsonc`, `lua`, `make`, `markdown`, `markdown_inline`, `python`, `rust`, `toml`, `typescript`, `vimdoc`, `vue`, `yaml`
-    *   Auto-disable for files >100KB
+    *   Highlight auto-disables for files >1MB
 
 ### Performance
 
-*   **[faster.nvim](https://github.com/pteroctopus/faster.nvim):** Auto-optimize for large files (>2MB).
+*   **[faster.nvim](https://github.com/pteroctopus/faster.nvim):** Auto-optimize for large files (>1MB).
 *   **[vim-startuptime](https://github.com/dstein64/vim-startuptime):** Startup profiler (`:StartupTime`).
 *   **[nvim-bufdel](https://github.com/ojroques/nvim-bufdel):** Optimized buffer deletion (`<leader>bd/bD/ba/bo`).
 
@@ -83,21 +85,23 @@ The leader key is set to `<Space>`.
 LSP configurations are stored in the `lsp/` directory for easy management:
 
 *   `lsp/ty.lua` - Python LSP using the `ty` language server
+*   `lsp/lua_ls.lua` - Lua LSP using `lua-language-server`
 
 To add more LSP servers, create new files in the `lsp/` directory following the same pattern.
+
+Note: the current machine runtime is `NVIM v0.10.4`. The config still keeps the built-in LSP wiring in `lua/plugins/lsp.lua`, but if you want to rely on Neovim 0.11-only LSP APIs everywhere, upgrade Neovim first.
 
 ## Performance Optimizations
 
 This configuration includes extensive performance optimizations:
 
 *   **Early optimizations:** `vim.loader.enable()` for faster Lua module loading
-*   **Disabled built-in plugins:** 20+ unnecessary plugins disabled
+*   **Disabled built-in plugins:** redundant built-in plugins are disabled once in `init.lua`
 *   **Lazy loading:** All plugins load on-demand via events, commands, or keymaps
-*   **Cache enabled:** 2-day TTL for lazy.nvim cache
-*   **Large file handling:** Automatic feature disabling for files >1MB
-*   **Global statusline:** Single statusline for all windows (faster)
+*   **Large file handling:** `faster.nvim` disables selected expensive features for files >1MB
+*   **Global statusline:** Single statusline for all windows
 *   **No swap/backup files:** Faster file operations
-*   **Optimized autocmds:** Cursorline disabled in insert mode
+*   **Optimized autocmds:** relative number toggle and cursorline disable in insert mode
 
 ### Benchmarking
 
@@ -124,5 +128,4 @@ The following options are set in `lua/config/options.lua`:
 The following autocmds are set in `lua/config/autocmds.lua`:
 
 *   Toggle relative numbers on entering and leaving insert mode.
-*   Large file detection and optimization (>1MB).
 *   Cursorline disabled in insert mode for better performance.

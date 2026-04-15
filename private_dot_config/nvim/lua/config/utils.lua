@@ -17,18 +17,21 @@ M.border = 'rounded'
 
 -- LSP keymaps setup (reusable across LSP configs)
 function M.setup_lsp_keymaps(bufnr)
-  local opts = { buffer = bufnr, noremap = true, silent = true }
+  local base_opts = { buffer = bufnr, noremap = true, silent = true }
+  local function map(lhs, rhs, desc)
+    vim.keymap.set('n', lhs, rhs, vim.tbl_extend('force', base_opts, { desc = desc }))
+  end
 
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-  vim.keymap.set('n', '<leader>cf', function()
+  map('gd', vim.lsp.buf.definition, 'Go to definition')
+  map('gD', vim.lsp.buf.declaration, 'Go to declaration')
+  map('gr', vim.lsp.buf.references, 'Go to references')
+  map('gi', vim.lsp.buf.implementation, 'Go to implementation')
+  map('K', vim.lsp.buf.hover, 'Hover documentation')
+  map('<leader>rn', vim.lsp.buf.rename, 'Rename symbol')
+  map('<leader>ca', vim.lsp.buf.code_action, 'Code action')
+  map('<leader>cf', function()
     vim.lsp.buf.format({ async = true })
-  end, opts)
+  end, 'Format buffer')
 end
 
 -- LSP document highlight setup (reusable)
