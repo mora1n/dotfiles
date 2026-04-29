@@ -1,10 +1,9 @@
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# TMUX CONFIGURATION
+# Environment
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-source-file ~/.config/tmux/conf.d/00-environment.tmux
-source-file ~/.config/tmux/conf.d/10-options.tmux
-source-file ~/.config/tmux/conf.d/20-keybindings.tmux
-source-file ~/.config/tmux/conf.d/40-plugins.tmux
-
-run-shell "~/.config/tmux/plugins/tpm/tpm >/dev/null 2>&1; tmux source-file ~/.config/tmux/conf.d/90-after-plugins.tmux"
+# IBus input method support.
+set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY XMODIFIERS GTK_IM_MODULE QT_IM_MODULE DBUS_SESSION_BUS_ADDRESS"
+set-environment -g XMODIFIERS @im=ibus
+set-environment -g GTK_IM_MODULE ibus
+set-environment -g QT_IM_MODULE ibus

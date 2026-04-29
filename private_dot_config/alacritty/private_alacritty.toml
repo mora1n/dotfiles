@@ -1,6 +1,6 @@
 # Terminal Configuration
 [terminal.shell]
-program = "/home/morain/.config/tmux/new-alacritty-session.sh"
+program = "/home/morain/.config/tmux/scripts/new-alacritty-session.sh"
 
 # Environment Variables
 [env]
