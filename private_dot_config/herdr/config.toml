@@ -54,20 +54,17 @@ pane_borders = "always"
 pane_outer_borders = true
 pane_scrollbars = true
 pane_gaps = false
-status_indicators = "symbols"
+status_indicators = "dots"
 tab_bar_position = "top"
 window_title = "{hostname}: {workspace}"
 
 [ui.sidebar.agents]
 rows = [
   [
-    { token = "state_icon", bold = true, dim = false },
-    { token = "agent", fg = "#8be9fd", bold = true, dim = false },
+    { token = "state_icon" },
+    { token = "agent", fg = "#8be9fd",  dim = false },
   ],
-  [
-    { token = "workspace", fg = "#f8f8f2" },
-    { token = "tab", fg = "#bd93f9" },
-  ],
+  [ "machine", "workspace" ],
 ]
 
 [theme]
