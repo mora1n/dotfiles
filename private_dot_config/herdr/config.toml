@@ -50,6 +50,13 @@ enabled = true
 show_agent_labels_on_pane_borders = false
 agent_panel_sort = "priority"
 prompt_new_tab_name = false
+pane_borders = "always"
+pane_outer_borders = true
+pane_scrollbars = true
+pane_gaps = false
+status_indicators = "symbols"
+tab_bar_position = "top"
+window_title = "{hostname}: {workspace}"
 
 [ui.sidebar.agents]
 rows = [
@@ -72,3 +79,6 @@ delivery = "system"
 
 [update]
 channel = "stable"
+
+[terminal]
+kitty_graphics = true
