@@ -36,6 +36,15 @@ set -g prompt-cursor-colour "#8be9fd"
 set -g prompt-cursor-style blinking-bar
 set -g input-buffer-size 2097152
 
+# tmux 3.7/3.8 copy mode and built-in UI, matching the Dracula theme.
+set -s theme dark
+set -g copy-mode-line-numbers hybrid
+set -g copy-mode-line-number-style fg=#6272a4
+set -g copy-mode-current-line-number-style fg=#f1fa8c,bold
+set -g copy-mode-current-line-style bg=#44475a
+set -g pane-scrollbars auto-hide
+set -g pane-scrollbars-style bg=#282a36,fg=#6272a4,width=1,pad=0
+
 # Status bar
 set -g status-position top
 

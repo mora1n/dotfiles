@@ -1,6 +1,6 @@
 # Tmux 快捷键速查表
 
-> 基于 `~/.config/tmux/tmux.conf`、tmux 3.6 和当前有效按键表。
+> 适用于 `~/.config/tmux/tmux.conf` 和 tmux 3.8。
 
 ## 前缀键
 
@@ -19,6 +19,7 @@
 | `prefix + s` | 打开 sesh popup；当前项目默认选中 |
 | `prefix + S` | 使用 fzf 选择并删除 session |
 | `prefix + Backspace` | 切换到上一个使用的 session |
+| `prefix + Shift-Tab` | 在原生浮动面板中模糊搜索并切换 session |
 | `prefix + (` | 上一个 session |
 | `prefix + )` | 下一个 session |
 | `prefix + $` | 重命名当前 session |
@@ -143,10 +144,14 @@ Pane 从 `1` 开始编号。
 | `g` / `G` | 跳到顶部或底部 |
 | `/` / `?` | 向下或向上搜索 |
 | `n` / `N` | 下一个或上一个匹配 |
+| `r` | 从 pane 刷新当前 copy mode 内容 |
+| `Ctrl-h` | 显示 copy mode 内置帮助 |
 | `Ctrl-u` / `Ctrl-d` | 向上或向下半页 |
 | `Ctrl-b` / `Ctrl-f` | 向上或向下整页 |
 | 鼠标拖拽 | 选择并复制到 X11 clipboard |
 | 双击 / 三击 | 复制单词或整行，并保持 viewport 位置 |
+
+键盘进入 copy mode 时显示混合行号：当前行为绝对行号，其他行为相对行号；鼠标进入时不显示行号。当前行使用 Dracula 背景高亮，滚动条在滚动或悬停时显示，空闲后自动隐藏。
 
 其他剪贴板操作：
 
@@ -169,6 +174,8 @@ Pane 从 `1` 开始编号。
 | `prefix + ?` | 显示带说明的完整按键列表 |
 | `prefix + /` | 按键说明搜索 |
 | `prefix + :` | 打开 tmux command prompt |
+
+tmux 3.8 的默认 `prefix + Tab` 已被当前配置保留为“上一个 window”；默认 `prefix + Shift-Tab` 的 session 模糊切换仍可使用。
 
 ## 插件与持久化
 
