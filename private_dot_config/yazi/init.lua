@@ -16,9 +16,6 @@ require("full-border"):setup()
 require("git"):setup({ order = 1500 })
 
 -- ═══════════════════════════════════════════════════════════
---  Vim-style Relative Motions
+--  Jump to Visible Files
 -- ═══════════════════════════════════════════════════════════
-require("relative-motions"):setup({
-    show_numbers = "relative_absolute",
-    show_motion = true
-})
+require("easyjump"):setup()

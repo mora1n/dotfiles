@@ -36,8 +36,10 @@ normalized names (`application/tar`, not `application/x-tar`).
 - `c`, then `m`: chmod selected files.
 - `C`: compress selected files with ouch.
 - `p`: paste into the hovered directory, or the current directory.
-- `2j`, `2k`, `3gg`: relative motion or jump to an absolute position.
-- `2t`: create two tabs; the preset shortcut for one tab is `t`, then `t`.
+- `i`: show Easyjump hints, then type the displayed one- or two-letter label
+  to jump to a visible file. Escape cancels the jump.
+- `1` through `9`: use Yazi's preset tab-switching shortcuts.
+- `t`, then `t`: create a tab.
 - `T`: close the current tab.
 - `q`: confirm before quitting when multiple tabs are open.
 - `!`: start an interactive shell in the current directory.
@@ -59,9 +61,12 @@ The Git changes view therefore lists the files without running this fetcher.
 
 ## Plugins and maintenance
 
-`package.toml` pins 13 plugins and the Dracula flavor managed by `ya`. Use
-`ya pkg install` to restore the locked dependencies and `ya pkg upgrade`
+`package.toml` records 14 plugins and the Dracula flavor managed by `ya`.
+Use `ya pkg install` to restore the recorded dependencies and `ya pkg upgrade`
 to update them; review the changes, then sync only Yazi files with chezmoi.
+The `rev` and `hash` fields are generated installation records. None of the
+revisions use the `=` prefix that prevents `ya pkg upgrade` from updating a
+package.
 
 The new official plugins are `git`, `vcs-files`, `diff`, and `toggle-pane`.
 The existing `smart-enter`, `smart-paste`, `smart-filter`, `chmod`, `mount`,
@@ -105,18 +110,21 @@ Reviewed alternatives on 2026-10-20:
   `g` directory shortcuts remain available.
 
 Dracula now comes directly from `yazi-rs/flavors:dracula`, installed with
-`ya pkg add yazi-rs/flavors:dracula` and pinned in `package.toml`.
+`ya pkg add yazi-rs/flavors:dracula` and recorded in `package.toml`.
 The flavor files are unmodified upstream files; the previous custom
 `dracula/yazi` adaptation has been replaced. Both dark and light terminal
 modes select Dracula. Git status styles remain in `theme.toml`, outside
 the managed flavor, so a package update can preserve those overrides.
 
-`relative-motions` is maintained locally. Its upstream revision `a603d9e`
-calls the removed `ya.mgr_emit` API. The local version uses `ya.emit` and
-component children hooks, preserving native file rendering and drag/drop.
-It is deliberately absent from `package.toml` to prevent upgrades replacing
-the compatibility fixes. Its original license and upstream README remain
-in the plugin directory.
+Easyjump replaces `relative-motions`. Install it with
+`ya pkg add mikavilpas/easyjump.yazi:easyjump`; initialize it with
+`require("easyjump"):setup()`. It uses upstream defaults and is updated by
+`ya pkg upgrade`, without a manually selected tag or commit.
+
+Chezmoi manages the Easyjump dependency declaration, initialization, and
+key binding. Its installed source directory is ignored by chezmoi and stays
+under `ya pkg` management. The obsolete `relative-motions` source is removed
+when applying this configuration.
 
 ## Preview dependencies
 

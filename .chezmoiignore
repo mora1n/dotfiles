@@ -9,6 +9,10 @@ README.md
 .config/tmux/plugins
 .config/tmux/plugins/**
 
+# Easyjump is installed and updated by ya pkg.
+.config/yazi/plugins/easyjump.yazi
+.config/yazi/plugins/easyjump.yazi/**
+
 # Fish maintains universal variables as local runtime state.
 .config/fish/fish_variables
 

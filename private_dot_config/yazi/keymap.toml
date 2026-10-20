@@ -108,55 +108,13 @@ run  = "close"
 desc = "Close current tab"
 
 # ═══════════════════════════════════════════════════════════
-#  Vim-style Relative Motions
+#  Jump to Visible Files
 # ═══════════════════════════════════════════════════════════
-# Usage: Press number keys to trigger vim-style relative motions
-# Examples: 3j (down 3), 5k (up 5), 2t (create 2 tabs), gg (go to line)
 
 [[mgr.prepend_keymap]]
-on = [ "1" ]
-run = "plugin relative-motions 1"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "2" ]
-run  = "plugin relative-motions 2"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "3" ]
-run  = "plugin relative-motions 3"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "4" ]
-run  = "plugin relative-motions 4"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "5" ]
-run  = "plugin relative-motions 5"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "6" ]
-run  = "plugin relative-motions 6"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "7" ]
-run  = "plugin relative-motions 7"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "8" ]
-run  = "plugin relative-motions 8"
-desc = "Move in relative steps"
-
-[[mgr.prepend_keymap]]
-on   = [ "9" ]
-run  = "plugin relative-motions 9"
-desc = "Move in relative steps"
+on   = "i"
+run  = "plugin easyjump"
+desc = "Jump to a visible file"
 
 # ═══════════════════════════════════════════════════════════
 #  Device Mounting
