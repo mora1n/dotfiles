@@ -7,7 +7,7 @@ zmodule git
 zmodule input
 zmodule termtitle
 zmodule utility
-zmodule fzf
+zmodule fzf --if '[[ -t 0 && -t 1 ]]'
 
 # Completion definitions must precede completion initialization.
 zmodule zsh-users/zsh-completions --fpath src

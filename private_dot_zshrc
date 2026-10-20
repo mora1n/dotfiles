@@ -57,7 +57,8 @@ HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=$HOME/.zhistory
 setopt HIST_IGNORE_SPACE HIST_VERIFY HIST_REDUCE_BLANKS
-setopt HIST_IGNORE_ALL_DUPS INC_APPEND_HISTORY
+# Zim's environment module enables SHARE_HISTORY.
+setopt HIST_IGNORE_ALL_DUPS
 setopt AUTO_MENU COMPLETE_IN_WORD ALWAYS_TO_END
 
 zstyle ':completion:*' completer _complete _match _approximate
@@ -111,7 +112,7 @@ unset widget pair name
 
 # -- Fuzzy Finder ------------------------------------------------------------
 
-if (( ${+commands[fzf]} )); then
+if (( ${+commands[fzf]} && ${+widgets[fzf-file-widget]} )); then
   export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --bind=ctrl-k:kill-line'
   if (( ${+commands[fd]} )); then
     export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -171,7 +172,7 @@ bindkey -M viins '^[[1;2F' visual-select-end-of-line
 
 # -- Lazy Tool Initialization ------------------------------------------------
 
-if (( ${+commands[uv]} )); then
+if (( ${+commands[uv]} && ${+functions[compdef]} )); then
   _uv_lazy_completion() {
     local completion
     completion=$(uv generate-shell-completion zsh) || return
@@ -181,7 +182,7 @@ if (( ${+commands[uv]} )); then
   compdef _uv_lazy_completion uv
 fi
 
-if (( ${+commands[uvx]} )); then
+if (( ${+commands[uvx]} && ${+functions[compdef]} )); then
   _uvx_lazy_completion() {
     local completion
     completion=$(uvx --generate-shell-completion zsh) || return
@@ -254,7 +255,7 @@ y() {
 # -- Prompt and Terminal Integration -----------------------------------------
 
 local tool_init
-if (( ${+commands[starship]} )); then
+if [[ ${TERM-} != dumb && ${+commands[starship]} ]]; then
   tool_init=$(starship init zsh) || return
   eval "$tool_init" || return
 fi
@@ -271,8 +272,10 @@ _sync_tmux_graphical_environment() {
     show-environment -s -t "$TMUX_PANE" XAUTHORITY) || return
   eval "$tmux_environment"
 }
-add-zsh-hook preexec _sync_tmux_graphical_environment
-_sync_tmux_graphical_environment
+if [[ -n ${TMUX-} && -n ${TMUX_PANE-} ]]; then
+  add-zsh-hook preexec _sync_tmux_graphical_environment
+  _sync_tmux_graphical_environment
+fi
 
 if [[ -n ${HERDR_PANE_ID-} ]]; then
   for _har_hook in $HOME/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.zsh(N); do
