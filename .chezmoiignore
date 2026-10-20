@@ -19,3 +19,8 @@ README.md
 # Zsh completion dumps and caches are local runtime state.
 .cache/zsh
 .cache/zsh/**
+
+# Ghostty packages with a Nautilus extension already provide this menu item.
+{{ if stat "/usr/share/nautilus-python/extensions/ghostty.py" }}
+.local/share/nautilus-python/extensions/open-ghostty.py
+{{ end }}

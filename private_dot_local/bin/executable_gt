@@ -3,11 +3,11 @@
 set -euo pipefail
 
 die() {
-  printf 'at: %s\n' "$*" >&2
+  printf 'gt: %s\n' "$*" >&2
   exit 1
 }
 
-(( $# <= 1 )) || die "usage: at [directory]"
+(( $# <= 1 )) || die "usage: gt [directory]"
 command -v tmux >/dev/null 2>&1 || die "required command not found: tmux"
 
 project_root() {
@@ -50,7 +50,7 @@ switch_to_previous_session() {
       exec tmux switch-client -t "=$candidate"
     fi
   done < <(tmux list-sessions -F $'#{session_last_attached}\t#{session_name}' | sort -rn)
-  printf 'at: already in the only tmux session: %s\n' "$current_session" >&2
+  printf 'gt: already in the only tmux session: %s\n' "$current_session" >&2
 }
 
 if (( $# == 1 )); then
