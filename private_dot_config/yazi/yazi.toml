@@ -3,6 +3,11 @@
 # Preview archives with ouch and directories with eza.
 # Yazi normalizes MIME subtypes by removing x- and vnd. prefixes.
 [plugin]
+prepend_fetchers = [
+	# Git invokes a local command; search and remote URLs are not filesystem CWDs.
+	{ url = "regular://*", run = "git", group = "git" },
+	{ url = "regular://*/", run = "git", group = "git" },
+]
 prepend_previewers = [
 	{ mime = "application/{zip,tar,gzip,bzip*,7z*,rar,xz,zstd,lzma,java-archive}", run = "ouch" },
 	{ url = "*.{zip,tar,gz,tgz,bz2,tbz,tbz2,xz,txz,zst,tzst,7z,rar,jar}", run = "ouch" },

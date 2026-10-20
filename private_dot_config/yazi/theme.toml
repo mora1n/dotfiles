@@ -9,3 +9,21 @@
 [flavor]
 dark = "dracula"
 light = "dracula"
+
+# Status signs for yazi-rs/plugins:git.
+[git]
+ignored   = { fg = "#6272a4" }
+untracked = { fg = "#ff79c6" }
+unstaged  = { fg = "#ffb86c" }
+staged    = { fg = "#50fa7b" }
+added     = { fg = "#50fa7b" }
+deleted   = { fg = "#ff5555" }
+updated   = { fg = "#f1fa8c" }
+
+ignored_sign   = "i "
+untracked_sign = "? "
+unstaged_sign  = "M "
+staged_sign    = "S "
+added_sign     = "A "
+deleted_sign   = "D "
+updated_sign   = "U "

@@ -41,11 +41,53 @@ normalized names (`application/tar`, not `application/x-tar`).
 - `T`: close the current tab.
 - `q`: confirm before quitting when multiple tabs are open.
 - `!`: start an interactive shell in the current directory.
+- `g`, then `v`: show changed and untracked Git files; `Ctrl+s` cancels this
+  search view and returns to its original directory.
+- `c`, then `p`: copy a unified diff of the first selected file and the
+  hovered file to the clipboard. Select one file with Space, hover another,
+  then run the shortcut. This copies a patch; it does not launch an editor.
+- `g`, then `p`: hide/restore the preview pane.
+- `g`, then `P`: maximize/restore the preview pane.
+
+Git status appears automatically in repository file lists: `?` untracked,
+`M` unstaged, `S` staged, `A` added, `D` deleted, `U` conflict/updated, and
+`i` ignored. Statuses also propagate to directories. Clean files have no sign.
+Git fetchers match `regular://` paths only. The current official plugin
+passes its URL directly as the Git working directory, which fails for
+`search://` results; remote and virtual URLs also need separate handling.
+The Git changes view therefore lists the files without running this fetcher.
 
 ## Plugins and maintenance
 
-`package.toml` pins the managed plugins and Dracula flavor. Use `ya pkg upgrade`
-to update them, review the changes, then sync only Yazi files with chezmoi.
+`package.toml` pins 13 plugins installed and managed by `ya`. Use
+`ya pkg install` to restore the locked dependencies and `ya pkg upgrade`
+to update them; review the changes, then sync only Yazi files with chezmoi.
+
+The new official plugins are `git`, `vcs-files`, `diff`, and `toggle-pane`.
+The existing `smart-enter`, `smart-paste`, `smart-filter`, `chmod`, `mount`,
+`full-border`, `piper`, `ouch`, and `starship` remain in use. Their current
+features fit this configuration without changing file operation semantics.
+
+Reviewed alternatives on 2026-10-20:
+
+- `augment-command` consolidates several behaviors but would change the
+  existing selection, navigation, and archive workflows; not installed.
+- `faster-piper` adds preview caching. Keep `piper` for the current eza
+  directory tree until a measured preview performance problem warrants it.
+- `mime-ext` trades detection accuracy for speed; not installed.
+- `yatline` overlaps the existing starship/status bar; not installed.
+- `bunny` is a useful lightweight bookmark menu, but its directory symlink
+  in `test/plugins` cannot be materialized by this version of `ya`.
+  `dedukun/bookmarks` still calls the removed `ya.mgr_emit` API, and `yamb`
+  dereferences the hovered entry before checking for an empty directory.
+  These candidates are not installed. Built-in `z` (fzf), `Z` (zoxide), and
+  `g` directory shortcuts remain available.
+
+The requested `dracula/yazi` theme is adapted for the current schema and
+managed by chezmoi. Its source commit, conversion notes, license, and syntax
+theme provenance are documented in `flavors/dracula.yazi/README.md`.
+It is deliberately absent from `package.toml`; `ya` cannot install that
+repository's layout directly.
 
 `relative-motions` is maintained locally. Its upstream revision `a603d9e`
 calls the removed `ya.mgr_emit` API. The local version uses `ya.emit` and

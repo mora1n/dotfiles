@@ -1,36 +1,37 @@
-<div align="center">
-  <img src="https://github.com/sxyazi/yazi/blob/main/assets/logo.png?raw=true" alt="Yazi logo" width="20%">
-</div>
+# Dracula for Yazi 26.9.1
 
-<h3 align="center">
-	Dracula Flavor for <a href="https://github.com/sxyazi/yazi">Yazi</a>
-</h3>
+Adapted on 2026-10-20 from the requested upstream:
 
-## 👀 Preview
+- Repository: https://github.com/dracula/yazi
+- Commit: `1b1a8d1083474defa9e4c1c3de4db9576f23175f` (2025-11-19)
+- Palette and file styles: upstream `flavor.toml`
+- License: upstream MIT license, retained in `LICENSE`
 
-<img src="preview.png" width="600" />
+The upstream file mixes older Yazi theme keys with settings that current
+Yazi does not implement. This adaptation uses its Dracula palette and file
+colors with the current theme schema:
 
-## 🎨 Installation
+- `[manager]` becomes `[mgr]`; hovered styles move to `[indicator]`.
+- Mode colors use `[mode]`; notifications use `title_info/warn/error`.
+- File rules use `url` instead of `name`, with full-path patterns for names.
+- Specific names precede generic extensions; fallbacks are last.
+- Duplicate size/duration/ratio variants become one style per pattern.
+- Unsupported size, duration, ratio, regex, icon-prefix, animation, opener,
+  and preview settings are omitted. Native Yazi icons remain in use.
+- UI layout follows the previous compatible Dracula flavor; background,
+  foreground, indicator, and remaining accents use the requested palette.
 
-```sh
-ya pkg add yazi-rs/flavors:dracula
-```
+The upstream contains no syntax theme. The existing `tmtheme.xml` and its
+`LICENSE-tmtheme` are retained unchanged from `yazi-rs/flavors:dracula`,
+revision `1183892`; they are not files supplied by `dracula/yazi`.
 
-## ⚙️ Usage
+This adapted flavor is maintained by chezmoi, separately from `ya`.
+Current `ya pkg add` expects a `repo.yazi` repository or a `child.yazi`
+package directory. The requested `dracula/yazi` repository has neither
+layout, so it cannot be installed directly with `ya pkg add dracula/yazi`.
+The old `yazi-rs/flavors:dracula` package entry has been removed to prevent
+`ya pkg upgrade` from replacing this adaptation.
 
-Set the content of your `theme.toml` to enable it as your _dark_ flavor:
-
-```toml
-[flavor]
-dark = "dracula"
-```
-
-Make sure your `theme.toml` doesn't contain anything other than `[flavor]`, unless you want to override certain styles of this flavor.
-
-See the [Yazi flavor documentation](https://yazi-rs.github.io/docs/flavors/overview) for more details.
-
-## 📜 License
-
-The flavor is MIT-licensed, and the included tmTheme is also MIT-licensed.
-
-Check the [LICENSE](LICENSE) and [LICENSE-tmtheme](LICENSE-tmtheme) file for more details.
+To update, pull the repository into a scratch checkout, review upstream
+changes against this adaptation and the current Yazi theme schema, then
+sync the reviewed flavor directory with chezmoi.
