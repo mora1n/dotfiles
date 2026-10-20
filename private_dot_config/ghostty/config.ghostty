@@ -1,8 +1,6 @@
 # Appearance
 theme = Dracula
 font-family = JetBrainsMono Nerd Font Mono
-# Claude Code uses U+23F5 for its permission mode indicator.
-font-codepoint-map = U+23F5=Symbola
 font-size = 11
 bold-color = bright
 cursor-style = bar
