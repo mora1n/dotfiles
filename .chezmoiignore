@@ -11,3 +11,11 @@ README.md
 
 # Fish maintains universal variables as local runtime state.
 .config/fish/fish_variables
+
+# Zim installs plugins and generates its own initialization and bytecode.
+.config/zsh/.zim
+.config/zsh/.zim/**
+
+# Zsh completion dumps and caches are local runtime state.
+.cache/zsh
+.cache/zsh/**

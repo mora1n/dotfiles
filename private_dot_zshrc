@@ -2,147 +2,104 @@
 # Zsh Configuration
 # ============================================================================
 
-# ----------------------------------------------------------------------------
-# Performance Profiling (Uncomment to measure startup time)
-# ----------------------------------------------------------------------------
-# zmodload zsh/zprof
+# -- Environment -------------------------------------------------------------
 
-# ----------------------------------------------------------------------------
-# ZDOTDIR and Zim Setup
-# ----------------------------------------------------------------------------
+ZDOTDIR=$HOME
+ZIM_HOME=$HOME/.config/zsh/.zim
+ZIM_CONFIG_FILE=$HOME/.config/zsh/.zimrc
 
-# Set Zsh config directory
-ZDOTDIR=${HOME}
-ZIM_HOME=${HOME}/.config/zsh/.zim
-ZIM_CONFIG_FILE=${HOME}/.config/zsh/.zimrc
-
-# Keep completion paths unique and load available site/custom completions.
-typeset -gU fpath
+typeset -gU path PATH fpath
+path=("$HOME/.local/bin" "$HOME/.cargo/bin" /usr/local/go/bin "${path[@]}")
 [[ -d /usr/share/zsh/site-functions ]] && fpath=(/usr/share/zsh/site-functions $fpath)
-[[ -d ${HOME}/.config/zsh/completions ]] && fpath=(${HOME}/.config/zsh/completions $fpath)
 
-# zsh-autosuggestions performance optimizations (must be set before Zim init)
-ZSH_AUTOSUGGEST_MANUAL_REBIND=1                   # Skip automatic rebinding
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20                # Limit suggestion buffer size
-ZSH_AUTOSUGGEST_USE_ASYNC=1                       # Use async suggestions
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)     # Strategy: history first, then completion
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+export VCPKG_ROOT="$HOME/vcpkg"
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+export EZA_COLORS='ex=1;32'
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 
-# Add custom widgets to the accept list BEFORE Zim init
+if [[ -f $HOME/.config/zsh/.dir_colors ]]; then
+  local color_init
+  color_init=$(dircolors -b "$HOME/.config/zsh/.dir_colors") || return
+  eval "$color_init"
+  unset color_init
+fi
+
+# -- Module Setup ------------------------------------------------------------
+
+typeset -g ZSH_CACHE_DIR=${XDG_CACHE_HOME:-$HOME/.cache}/zsh
+[[ -d $ZSH_CACHE_DIR ]] || command mkdir -p -- "$ZSH_CACHE_DIR" || return
+zstyle ':zim:completion' dumpfile "$ZSH_CACHE_DIR/zcompdump"
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/zcompcache"
+
+# Autosuggestions bind once, after all custom widgets have been registered.
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
-  forward-char
-  end-of-line
-  vi-forward-char
-  vi-end-of-line
-  vi-add-eol
-  deselect-forward-char
-  deselect-end-of-line
+  forward-char end-of-line vi-forward-char vi-end-of-line vi-add-eol
+  deselect-forward-char deselect-end-of-line
 )
 
-# Download zimfw plugin manager if missing
-if [[ ! -e ${ZIM_HOME}/zimfw.zsh ]]; then
-  curl -fsSL --create-dirs -o ${ZIM_HOME}/zimfw.zsh \
-      https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh
+if [[ ! -r $ZIM_HOME/init.zsh ]]; then
+  print -u2 'Zim is not initialized. Run: zsh ~/.config/zsh/bootstrap.zsh'
+  return 1
 fi
+source "$ZIM_HOME/init.zsh" || return
 
-# Install missing modules and update ${ZIM_HOME}/init.zsh if missing or outdated
-if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
-  source ${ZIM_HOME}/zimfw.zsh init
-fi
+# -- History and Completion --------------------------------------------------
 
-# Initialize modules
-source ${ZIM_HOME}/init.zsh
+HISTSIZE=1000
+SAVEHIST=1000
+HISTFILE=$HOME/.zhistory
+setopt HIST_IGNORE_SPACE HIST_VERIFY HIST_REDUCE_BLANKS
+setopt HIST_IGNORE_ALL_DUPS INC_APPEND_HISTORY
+setopt AUTO_MENU COMPLETE_IN_WORD ALWAYS_TO_END
 
-# ----------------------------------------------------------------------------
-# Vi-mode Configuration
-# ----------------------------------------------------------------------------
-# Using Zsh built-in vi-mode
-
-# Enable vi-mode
-bindkey -v
-
-# Reduce ESC key delay for faster mode switching (in hundredths of a second)
-export KEYTIMEOUT=1
-
-# Cursor shape configuration for different vi modes
-# Use printf instead of echo for better performance
-function zle-keymap-select {
-  if [[ $KEYMAP == vicmd ]]; then
-    printf '\e[1 q'  # Block cursor
-  else
-    printf '\e[5 q'  # Beam cursor
-  fi
-}
-zle -N zle-keymap-select
-
-# Initialize with beam cursor
-function zle-line-init {
-  printf '\e[5 q'
-}
-zle -N zle-line-init
-
-# Reset cursor on command execution
-function preexec {
-  printf '\e[5 q'
-}
-
-# ----------------------------------------------------------------------------
-# History Configuration
-# ----------------------------------------------------------------------------
-
-# History settings
-HISTSIZE=1000                  # Number of commands to remember
-SAVEHIST=1000                  # Number of commands to save to file
-HISTFILE=${HOME}/.zhistory     # History file location
-
-# Enhanced history options
-setopt HIST_IGNORE_DUPS         # Don't record duplicate entries
-setopt HIST_IGNORE_SPACE        # Don't record commands starting with space
-setopt HIST_VERIFY              # Show command before executing from history
-setopt HIST_REDUCE_BLANKS       # Remove superfluous blanks
-setopt HIST_IGNORE_ALL_DUPS     # Delete old duplicate entries
-setopt INC_APPEND_HISTORY       # Write to history file immediately
-
-# ----------------------------------------------------------------------------
-# Completion Performance Optimization
-# ----------------------------------------------------------------------------
-
-# Completion cache settings (Zim's completion module will call compinit)
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ${HOME}/.zcompcache
-
-# Fuzzy matching for Fish-like path completion
 zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*:match:*' original only
 zstyle ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3))numeric)'
-
-# Substring matching (Fish-style)
 zstyle ':completion:*' matcher-list '' \
   'm:{a-zA-Z}={A-Za-z}' \
   'r:|[._-]=* r:|=*' \
   'r:|?=** m:{a-z\-}={A-Z\_}'
-
-# Completion menu behavior
-setopt AUTO_MENU COMPLETE_IN_WORD ALWAYS_TO_END
-
-# Completion display settings
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# ----------------------------------------------------------------------------
-# Custom ZLE Widgets
-# ----------------------------------------------------------------------------
+# -- Vi Mode and Cursor ------------------------------------------------------
 
-# Helper function for visual selection
+bindkey -v
+KEYTIMEOUT=1
+autoload -Uz add-zsh-hook add-zle-hook-widget
+
+_set_vi_cursor() {
+  if [[ $KEYMAP == vicmd ]]; then
+    printf '\e[1 q'
+  else
+    printf '\e[5 q'
+  fi
+}
+_set_insert_cursor() { printf '\e[5 q'; }
+
+# Compose with Zim's terminal-mode hooks instead of replacing them.
+add-zle-hook-widget keymap-select _set_vi_cursor
+add-zle-hook-widget line-init _set_insert_cursor
+add-zsh-hook preexec _set_insert_cursor
+
+# -- Selection Widgets -------------------------------------------------------
+
 _start_selection_if_needed() { [[ $REGION_ACTIVE -eq 0 ]] && zle set-mark-command; }
 
-# Deselect widgets - clear selection before moving
 for widget in forward-char backward-char forward-word backward-word beginning-of-line end-of-line; do
   eval "deselect-${widget}() { [[ \$REGION_ACTIVE -ne 0 ]] && zle deactivate-region; zle ${widget}; }"
   zle -N "deselect-${widget}"
 done
 
-# Visual selection widgets - start selection if needed
 for pair in forward:forward-char backward:backward-char up:up-line-or-history down:down-line-or-history \
             forward-word:forward-word backward-word:backward-word \
             beginning-of-line:beginning-of-line end-of-line:end-of-line; do
@@ -152,132 +109,69 @@ for pair in forward:forward-char backward:backward-char up:up-line-or-history do
 done
 unset widget pair name
 
-# Bind custom widgets to autosuggestions
-if (( ${+functions[_zsh_autosuggest_bind_widget]} )); then
-  _zsh_autosuggest_bind_widget deselect-forward-char accept
-  _zsh_autosuggest_bind_widget deselect-end-of-line accept
-fi
+# -- Fuzzy Finder ------------------------------------------------------------
 
-# ----------------------------------------------------------------------------
-# fzf Configuration
-# ----------------------------------------------------------------------------
-
-# fzf performance and UI settings
-if command -v fzf &>/dev/null; then
+if (( ${+commands[fzf]} )); then
   export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --bind=ctrl-k:kill-line'
-
-  # Use fd for faster file searching (if available)
-  if command -v fd &>/dev/null; then
+  if (( ${+commands[fd]} )); then
     export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
     export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
   fi
+  if (( ${+commands[eza]} )); then
+    # Zim's -1F preview lets eza consume the directory as --classify's value.
+    export FZF_CTRL_T_OPTS=${FZF_CTRL_T_OPTS// -1F / -1 --classify=always -- }
+    export FZF_ALT_C_OPTS=${FZF_ALT_C_OPTS// -1F / -1 --classify=always -- }
+  fi
+  for keymap in viins vicmd; do
+    bindkey -M "$keymap" '^T' fzf-file-widget
+    bindkey -M "$keymap" '\ec' fzf-cd-widget
+    bindkey -M "$keymap" '^R' fzf-history-widget
+  done
+  unset keymap
 fi
 
-# ----------------------------------------------------------------------------
-# Key Bindings
-# ----------------------------------------------------------------------------
-# Note: bindkey -v resets many default bindings, so we need to restore them
+# -- Key Bindings ------------------------------------------------------------
 
-# Re-bind fzf keys (bindkey -v resets them)
-if [[ -n ${commands[fzf]} ]]; then
-  bindkey -M viins '^T' fzf-file-widget      # Ctrl+T: file selector
-  bindkey -M viins '\ec' fzf-cd-widget       # Alt+C: directory selector
-  bindkey -M viins '^R' fzf-history-widget   # Ctrl+R: history search
-  bindkey -M vicmd '^T' fzf-file-widget
-  bindkey -M vicmd '\ec' fzf-cd-widget
-  bindkey -M vicmd '^R' fzf-history-widget
-fi
-
-# History substring search
-bindkey -M viins '^[[A' history-substring-search-up      # Up arrow
-bindkey -M viins '^[[B' history-substring-search-down    # Down arrow
+# History search.
+bindkey -M viins '^[[A' history-substring-search-up
+bindkey -M viins '^[[B' history-substring-search-down
 bindkey -M vicmd 'k' history-substring-search-up
 bindkey -M vicmd 'j' history-substring-search-down
 
-# Basic movement - deselect widgets cancel selection before moving
-bindkey -M viins '^[[C' deselect-forward-char            # Right arrow
-bindkey -M viins '^[[D' deselect-backward-char           # Left arrow
-bindkey -M viins '^[OC' deselect-forward-char            # Right arrow (alt)
-bindkey -M viins '^[OD' deselect-backward-char           # Left arrow (alt)
+# Movement clears the active selection.
+bindkey -M viins '^[[C' deselect-forward-char
+bindkey -M viins '^[[D' deselect-backward-char
+bindkey -M viins '^[OC' deselect-forward-char
+bindkey -M viins '^[OD' deselect-backward-char
+bindkey -M viins '^[[1;5C' deselect-forward-word
+bindkey -M viins '^[[1;5D' deselect-backward-word
+bindkey -M viins '^[^[[C' deselect-forward-word
+bindkey -M viins '^[^[[D' deselect-backward-word
+bindkey -M viins '^[[H' deselect-beginning-of-line
+bindkey -M viins '^[[F' deselect-end-of-line
+bindkey -M viins '^[[1~' deselect-beginning-of-line
+bindkey -M viins '^[[4~' deselect-end-of-line
+bindkey -M viins '^A' deselect-beginning-of-line
+bindkey -M viins '^E' deselect-end-of-line
 
-# Word movement - deselect widgets cancel selection before moving
-bindkey -M viins '^[[1;5C' deselect-forward-word         # Ctrl+Right
-bindkey -M viins '^[[1;5D' deselect-backward-word        # Ctrl+Left
-bindkey -M viins '^[^[[C' deselect-forward-word          # Ctrl+Right (alt)
-bindkey -M viins '^[^[[D' deselect-backward-word         # Ctrl+Left (alt)
+# Delete and backspace.
+bindkey -M viins '^[[3~' delete-char
+bindkey -M viins '^?' backward-delete-char
+bindkey -M viins '^H' backward-delete-char
 
-# Line start/end movement - deselect widgets cancel selection before moving
-bindkey -M viins '^[[H' deselect-beginning-of-line       # Home
-bindkey -M viins '^[[F' deselect-end-of-line             # End
-bindkey -M viins '^[[1~' deselect-beginning-of-line      # Home (alt)
-bindkey -M viins '^[[4~' deselect-end-of-line            # End (alt)
-bindkey -M viins '^A' deselect-beginning-of-line         # Ctrl+A
-bindkey -M viins '^E' deselect-end-of-line               # Ctrl+E
+# Extend selection by character, word, or line.
+bindkey -M viins '^[[1;2C' visual-select-forward
+bindkey -M viins '^[[1;2D' visual-select-backward
+bindkey -M viins '^[[1;2A' visual-select-up
+bindkey -M viins '^[[1;2B' visual-select-down
+bindkey -M viins '^[[1;6C' visual-select-forward-word
+bindkey -M viins '^[[1;6D' visual-select-backward-word
+bindkey -M viins '^[[1;2H' visual-select-beginning-of-line
+bindkey -M viins '^[[1;2F' visual-select-end-of-line
 
-# Delete keys
-bindkey -M viins '^[[3~' delete-char            # Delete
-bindkey -M viins '^?' backward-delete-char      # Backspace
-bindkey -M viins '^H' backward-delete-char      # Backspace (alt)
+# -- Lazy Tool Initialization ------------------------------------------------
 
-# Visual selection (Shift+Arrow)
-bindkey -M viins '^[[1;2C' visual-select-forward    # Shift+Right
-bindkey -M viins '^[[1;2D' visual-select-backward   # Shift+Left
-bindkey -M viins '^[[1;2A' visual-select-up         # Shift+Up
-bindkey -M viins '^[[1;2B' visual-select-down       # Shift+Down
-
-# Visual selection by word (Ctrl+Shift+Arrow)
-bindkey -M viins '^[[1;6C' visual-select-forward-word    # Ctrl+Shift+Right
-bindkey -M viins '^[[1;6D' visual-select-backward-word   # Ctrl+Shift+Left
-
-# Visual selection to line start/end (Shift+Home/End)
-bindkey -M viins '^[[1;2H' visual-select-beginning-of-line  # Shift+Home
-bindkey -M viins '^[[1;2F' visual-select-end-of-line        # Shift+End
-
-# ----------------------------------------------------------------------------
-# PATH Configuration
-# ----------------------------------------------------------------------------
-
-# Keep the managed PATH prefix ordered and unique.
-typeset -gU path PATH
-path=(
-  "$HOME/.local/bin"
-  "$HOME/.cargo/bin"
-  /usr/local/go/bin
-  "$HOME/phacility/arcanist/bin"
-  "$HOME/.npm-global/bin"
-  "${path[@]}"
-)
-
-# ----------------------------------------------------------------------------
-# tmux Graphical Environment
-# ----------------------------------------------------------------------------
-
-_sync_tmux_graphical_environment() {
-  [[ -n ${TMUX-} && -n ${TMUX_PANE-} ]] || return 0
-
-  local tmux_environment
-  tmux_environment=$(tmux show-environment -s -t "${TMUX_PANE}" DISPLAY) || return 1
-  eval "${tmux_environment}"
-  tmux_environment=$(tmux show-environment -s -t "${TMUX_PANE}" XAUTHORITY) || return 1
-  eval "${tmux_environment}"
-}
-
-autoload -Uz add-zsh-hook
-add-zsh-hook preexec _sync_tmux_graphical_environment
-_sync_tmux_graphical_environment
-
-# ----------------------------------------------------------------------------
-# Tool Initialization
-# ----------------------------------------------------------------------------
-
-# Cargo (Rust) - conditional loading
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-
-# uv environment - conditional loading
-[[ -f "$HOME/.local/bin/env" ]] && source "$HOME/.local/bin/env"
-
-# Generate uv completions only when they are first requested in this shell.
-if command -v uv &>/dev/null; then
+if (( ${+commands[uv]} )); then
   _uv_lazy_completion() {
     local completion
     completion=$(uv generate-shell-completion zsh) || return
@@ -287,7 +181,7 @@ if command -v uv &>/dev/null; then
   compdef _uv_lazy_completion uv
 fi
 
-if command -v uvx &>/dev/null; then
+if (( ${+commands[uvx]} )); then
   _uvx_lazy_completion() {
     local completion
     completion=$(uvx --generate-shell-completion zsh) || return
@@ -297,138 +191,93 @@ if command -v uvx &>/dev/null; then
   compdef _uvx_lazy_completion uvx
 fi
 
-# zoxide - only if command exists
-command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
-
-# ----------------------------------------------------------------------------
-# nvm - Lazy Loading (Performance Optimization)
-# ----------------------------------------------------------------------------
-# NVM adds 300-600ms to startup time. Use lazy loading to defer initialization
-# until actually needed (first use of nvm, node, npm, or npx commands).
-
 export NVM_DIR="$HOME/.nvm"
-
-# Add nvm's current version bin to PATH immediately (no performance cost)
-# This allows globally installed npm packages to work without loading nvm
-if [[ -d "$NVM_DIR/versions/node" ]]; then
+if [[ -d $NVM_DIR/versions/node ]]; then
   local nvm_default nvm_version_path
   local -a nvm_versions
-
-  # Read the preferred version without spawning external processes.
-  if [[ -r "$NVM_DIR/alias/default" ]]; then
+  if [[ -r $NVM_DIR/alias/default ]]; then
     IFS= read -r nvm_default < "$NVM_DIR/alias/default"
-  elif [[ -r "$HOME/.nvmrc" ]]; then
+  elif [[ -r $HOME/.nvmrc ]]; then
     IFS= read -r nvm_default < "$HOME/.nvmrc"
   fi
-
-  # Prefer the requested version prefix, otherwise use the highest installed version.
-  [[ -n "$nvm_default" ]] && nvm_versions=("$NVM_DIR/versions/node"/v${~nvm_default}*(Nn))
+  [[ -n $nvm_default ]] && nvm_versions=("$NVM_DIR/versions/node"/v${~nvm_default}*(Nn))
   (( ${#nvm_versions} )) || nvm_versions=("$NVM_DIR/versions/node"/v*(Nn))
   nvm_version_path=${nvm_versions[-1]}
-
-  # Add to PATH if found
-  [[ -d "$nvm_version_path/bin" ]] && path=("$nvm_version_path/bin" $path)
-
+  [[ -d $nvm_version_path/bin ]] && path=("$nvm_version_path/bin" $path)
   unset nvm_default nvm_version_path nvm_versions
 fi
 
-# Lazy load nvm - only load when actually needed
-# Only create wrapper for 'nvm' command itself, not node/npm/npx
-# This allows node/npm/npx binaries in PATH to work directly
 nvm() {
+  [[ -s $NVM_DIR/nvm.sh ]] || { print -u2 "Missing NVM: $NVM_DIR/nvm.sh"; return 1; }
   unset -f nvm
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  source "$NVM_DIR/nvm.sh" || return
+  [[ ! -s $NVM_DIR/bash_completion ]] || source "$NVM_DIR/bash_completion" || return
   nvm "$@"
 }
 
-# ----------------------------------------------------------------------------
-# Environment Variables
-# ----------------------------------------------------------------------------
+# -- Aliases and Functions ---------------------------------------------------
 
-# Input method settings
-export GTK_IM_MODULE=ibus
-export QT_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus
+alias ll='eza -l'
+alias la='eza -A'
+alias l='eza --classify=always'
 
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# vcpkg package manager root (CMake toolchain: $VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake)
-export VCPKG_ROOT="$HOME/vcpkg"
-
-# ----------------------------------------------------------------------------
-# Dracula Pro Theme Colors
-# ----------------------------------------------------------------------------
-
-# 加载 dircolors 配置
-if [[ -f "${HOME}/.config/zsh/.dir_colors" ]]; then
-  eval "$(dircolors -b ${HOME}/.config/zsh/.dir_colors)"
-fi
-
-# eza 颜色配置 (与 LS_COLORS 保持一致)
-export EZA_COLORS="ex=1;32"  # 可执行文件使用亮绿色
-
-# ----------------------------------------------------------------------------
-# Aliases
-# ----------------------------------------------------------------------------
-
-alias ll='eza -l'  # Long format
-alias la='eza -A'  # Show hidden files
-alias l='eza -F'   # Classify files
-
-# ----------------------------------------------------------------------------
-# Custom Functions
-# ----------------------------------------------------------------------------
-
-# Safety wrapper: prevent accidental deletion of root directory
 rm() {
-    for arg in "$@"; do
-        if [[ "$arg" =~ ^-.*[rf] ]] && [[ "$*" =~ (^|[[:space:]])/([[:space:]]|$) ]]; then
-            echo "Error: Deletion of root directory is prohibited" >&2
-            return 1
-        fi
-    done
-    command rm "$@"
-}
-
-# Yazi file manager with directory tracking
-# Usage: y [directory]
-# Shell will cd to the last visited directory after exiting yazi
-y() {
-    local tmp=$(mktemp -t "yazi-cwd.XXXXXX")
-    env -u NO_COLOR yazi "$@" --cwd-file="$tmp"
-    if [ -s "$tmp" ]; then
-        local cwd=$(cat "$tmp")
-        if [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-            builtin cd -- "$cwd"
-        fi
+  local arg
+  for arg in "$@"; do
+    if [[ "$arg" =~ ^-.*[rf] ]] && [[ "$*" =~ (^|[[:space:]])/([[:space:]]|$) ]]; then
+      print -u2 'Error: Deletion of root directory is prohibited'
+      return 1
     fi
-    rm -f -- "$tmp"
+  done
+  command rm "$@"
 }
 
-# ----------------------------------------------------------------------------
-# Prompt
-# ----------------------------------------------------------------------------
+# Retain Yazi's exit status and always remove its temporary cwd file.
+y() {
+  local cwd_file cwd yazi_exit
+  cwd_file=$(mktemp -t 'yazi-cwd.XXXXXX') || return
+  {
+    env -u NO_COLOR yazi "$@" --cwd-file="$cwd_file"
+    yazi_exit=$?
+    if (( yazi_exit == 0 )) && [[ -s $cwd_file ]]; then
+      cwd=$(<"$cwd_file")
+      if [[ -n $cwd && $cwd != $PWD ]]; then
+        builtin cd -- "$cwd" || return
+      fi
+    fi
+  } always {
+    command rm -f -- "$cwd_file" || return
+  }
+  return $yazi_exit
+}
 
-# Starship configuration file location
-export STARSHIP_CONFIG="${HOME}/.config/starship/starship.toml"
+# -- Prompt and Terminal Integration -----------------------------------------
 
-if command -v starship &>/dev/null; then
-  local starship_init
-  starship_init=$(starship init zsh) || return
-  eval "$starship_init" || return
-  unset starship_init
+local tool_init
+if (( ${+commands[starship]} )); then
+  tool_init=$(starship init zsh) || return
+  eval "$tool_init" || return
 fi
+if (( ${+commands[zoxide]} )); then
+  tool_init=$(zoxide init zsh) || return
+  eval "$tool_init" || return
+fi
+unset tool_init
 
-# Keep Herdr tab names aligned with the foreground command. The hook is a no-op
-# outside Herdr panes and self-locates the pinned managed plugin checkout.
-for _har_hook in ${HOME}/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.zsh(N); do
-  source "$_har_hook"
-  break
-done
-unset _har_hook
+_sync_tmux_graphical_environment() {
+  [[ -n ${TMUX-} && -n ${TMUX_PANE-} ]] || return 0
+  local tmux_environment
+  tmux_environment=$(tmux show-environment -s -t "$TMUX_PANE" DISPLAY \; \
+    show-environment -s -t "$TMUX_PANE" XAUTHORITY) || return
+  eval "$tmux_environment"
+}
+add-zsh-hook preexec _sync_tmux_graphical_environment
+_sync_tmux_graphical_environment
 
-# ----------------------------------------------------------------------------
-# Performance Profiling Results (Uncomment to display)
-# ----------------------------------------------------------------------------
-# zprof
+if [[ -n ${HERDR_PANE_ID-} ]]; then
+  for _har_hook in $HOME/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.zsh(N); do
+    source "$_har_hook"
+    break
+  done
+  unset _har_hook
+fi

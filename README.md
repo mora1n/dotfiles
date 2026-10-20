@@ -25,6 +25,9 @@ Neovim configuration is managed by the standalone
 are installed by TPM from the declarations in `40-plugins.tmux`; this repository
 only manages tmux's own configuration and plugin bootstrap script.
 
+Zim installs Zsh plugins from the managed module declarations. Plugin sources,
+generated initialization files, and compiled completion caches stay local.
+
 ## Bootstrap
 
 Install `git` and `chezmoi`, then initialize the repository:
@@ -54,6 +57,17 @@ configuration. Apply individual targets when only one component is needed:
 ```sh
 chezmoi apply ~/.zshrc
 ```
+
+After applying the Zsh configuration on a new machine, initialize its plugins:
+
+```sh
+zsh ~/.config/zsh/bootstrap.zsh
+```
+
+Run the same command after changing the Zim module declarations, then start a
+new Zsh session. It installs missing modules and rebuilds initialization files
+without updating already installed plugins. Normal shell startup does not
+download or install plugins.
 
 ## Repository layout
 
