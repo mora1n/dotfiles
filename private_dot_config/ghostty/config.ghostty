@@ -7,14 +7,12 @@ cursor-style = block
 cursor-opacity = 0.8
 
 # Window
-window-theme = ghostty
 window-width = 120
 window-height = 30
 window-padding-x = 6
 window-padding-y = 6
 window-padding-balance = true
 gtk-tabs-location = top
-gtk-custom-css = tabs.css
 background-opacity = 0.8
 # Keep opacity consistent in applications that paint their own backgrounds.
 background-opacity-cells = true

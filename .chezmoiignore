@@ -8,3 +8,6 @@ README.md
 # Installed and updated by TPM and the plugins' own Git repositories.
 .config/tmux/plugins
 .config/tmux/plugins/**
+
+# Fish maintains universal variables as local runtime state.
+.config/fish/fish_variables
