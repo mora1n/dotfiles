@@ -52,20 +52,20 @@ desc = "Open with..."
 
 [[mgr.prepend_keymap]]
 on   = [ "g", "o" ]
-for  = "unix"
-run  = 'shell xdg-open "$@" --confirm'
+for  = "linux"
+run  = 'shell --orphan -- for path in %s; do xdg-open "$path"; done'
 desc = "Open with default app"
 
 [[mgr.prepend_keymap]]
 on   = [ "g", "o" ]
 for  = "macos"
-run  = 'shell open "$@" --confirm'
+run  = 'shell --orphan -- open %s'
 desc = "Open with default app"
 
 [[mgr.prepend_keymap]]
 on   = [ "g", "o" ]
 for  = "windows"
-run  = 'shell start "" %* --confirm'
+run  = 'shell --orphan -- start "" %s1'
 desc = "Open with default app"
 
 # ═══════════════════════════════════════════════════════════

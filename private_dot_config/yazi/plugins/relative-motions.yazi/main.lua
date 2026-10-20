@@ -1,3 +1,4 @@
+-- Locally maintained for Yazi 26.9.1; upstream still uses removed APIs.
 --- @since 25.5.28
 -- stylua: ignore
 local MOTIONS_AND_OP_KEYS = {
@@ -40,35 +41,13 @@ local ENTER_MODE_CACHE_OR_FIRST = 2
 -----------------------------------------------
 
 local render_motion_setup = ya.sync(function(_)
-	if ui.render then
-		ui.render()
-	else
-		ya.render()
-	end
-
 	Status.motion = function() return ui.Span("") end
-
-	Status.children_redraw = function(self, side)
-		local lines = {}
-		if side == self.RIGHT then
-			lines[1] = self:motion(self)
-		end
-		for _, c in ipairs(side == self.RIGHT and self._right or self._left) do
-			lines[#lines + 1] = (type(c[1]) == "string" and self[c[1]] or c[1])(self)
-		end
-		return ui.Line(lines)
-	end
-
-	-- TODO: check why it doesn't work line this
-	-- Status:children_add(function() return ui.Span("") end, 1000, Status.RIGHT)
+	Status:children_add(function(self) return self:motion() end, 500, Status.RIGHT)
+	ui.render()
 end)
 
 local render_motion = ya.sync(function(_, motion_num, motion_cmd)
-	if ui.render then
-		ui.render()
-	else
-		ya.render()
-	end
+	ui.render()
 
 	Status.motion = function(self)
 		if not motion_num then
@@ -88,13 +67,7 @@ local render_motion = ya.sync(function(_, motion_num, motion_cmd)
 		local separator_open = status_config.sep_right.open
 		local separator_close = status_config.sep_right.close
 
-		-- TODO: REMOVE THIS IN NEXT RELEASE
-		local bg_style
-		if type(style.main.bg) == "function" then
-			bg_style = style.main:bg()
-		else
-			bg_style = style.main.bg
-		end
+		local bg_style = style.main:bg()
 
 		return ui.Line {
 			ui.Span(separator_open):fg(bg_style),
@@ -106,64 +79,23 @@ local render_motion = ya.sync(function(_, motion_num, motion_cmd)
 end)
 
 local render_numbers = ya.sync(function(_, mode)
-	if ui.render then
-		ui.render()
-	else
-		ya.render()
-	end
-
-	Entity.number = function(_, index, total, file, hovered)
-		local idx
-		if mode == SHOW_NUMBERS_RELATIVE then
-			idx = math.abs(hovered - index)
-		elseif mode == SHOW_NUMBERS_ABSOLUTE then
-			idx = file.idx
-		else -- SHOW_NUMBERS_RELATIVE_ABSOLUTE
-			if hovered == index then
-				idx = file.idx
-			else
-				idx = math.abs(hovered - index)
-			end
+	-- Add a number column without replacing Yazi's rendering or drag/drop support.
+	Entity:children_add(function(self)
+		local file = self._file
+		if not file.in_current then
+			return ""
 		end
 
-		local num_format = "%" .. #tostring(total) .. "d"
-
-		-- emulate vim's hovered offset
-		if hovered == index then
-			return ui.Span(string.format(num_format .. " ", idx))
-		else
-			return ui.Span(string.format(" " .. num_format, idx))
-		end
-	end
-
-	Current.redraw = function(self)
-		local files = self._folder.window
-		if #files == 0 then
-			return self:empty()
+		local current = cx.active.current
+		local idx = file.idx
+		if mode == SHOW_NUMBERS_RELATIVE or (mode == SHOW_NUMBERS_RELATIVE_ABSOLUTE and not file.is_hovered) then
+			idx = math.abs(current.cursor + 1 - idx)
 		end
 
-		local hovered_index
-		for i, f in ipairs(files) do
-			if f.is_hovered then
-				hovered_index = i
-				break
-			end
-		end
-
-		local entities, linemodes = {}, {}
-		for i, f in ipairs(files) do
-			linemodes[#linemodes + 1] = Linemode:new(f):redraw()
-
-			local entity = Entity:new(f)
-			entities[#entities + 1] = ui.Line({ Entity:number(i, #self._folder.files, f, hovered_index), entity:redraw() })
-				:style(entity:style())
-		end
-
-		return {
-			ui.List(entities):area(self._area),
-			ui.Text(linemodes):area(self._area):align(ui.Align.RIGHT),
-		}
-	end
+		local width = #tostring(#current.files)
+		return ui.Span(string.format("%" .. width .. "d ", idx))
+	end, 500)
+	ui.render()
 end)
 
 local function render_clear() render_motion() end
@@ -288,8 +220,8 @@ return {
 
 		if cmd == "g" then
 			if direction == "g" then
-				ya.mgr_emit("arrow", { "top" })
-				ya.mgr_emit("arrow", { lines - 1 })
+				ya.emit("arrow", { "top" })
+				ya.emit("arrow", { lines - 1 })
 				render_clear()
 				return
 			elseif direction == "j" then
@@ -297,7 +229,7 @@ return {
 			elseif direction == "k" then
 				cmd = "k"
 			elseif direction == "t" then
-				ya.mgr_emit("tab_switch", { lines - 1 })
+				ya.emit("tab_switch", { lines - 1 })
 				render_clear()
 				return
 			else
@@ -308,66 +240,66 @@ return {
 		end
 
 		if cmd == "j" then
-			ya.mgr_emit("arrow", { lines })
+			ya.emit("arrow", { lines })
 		elseif cmd == "k" then
-			ya.mgr_emit("arrow", { -lines })
+			ya.emit("arrow", { -lines })
 		elseif cmd == "h" then
 			for _ = 1, lines do
-				ya.mgr_emit("leave", {})
+				ya.emit("leave", {})
 			end
 		elseif cmd == "l" then
 			for _ = 1, lines do
-				ya.mgr_emit("enter", {})
+				ya.emit("enter", {})
 				local file_idx = get_cache_or_first_dir()
 				if file_idx then
-					ya.mgr_emit("arrow", { "top" })
-					ya.mgr_emit("arrow", { file_idx })
+					ya.emit("arrow", { "top" })
+					ya.emit("arrow", { file_idx })
 				end
 			end
 		elseif is_tab_command(cmd) then
 			if cmd == "t" then
 				for _ = 1, lines do
-					ya.mgr_emit("tab_create", {})
+					ya.emit("tab_create", {})
 				end
 			elseif cmd == "H" then
-				ya.mgr_emit("tab_switch", { -lines, relative = true })
+				ya.emit("tab_switch", { -lines, relative = true })
 			elseif cmd == "L" then
-				ya.mgr_emit("tab_switch", { lines, relative = true })
+				ya.emit("tab_switch", { lines, relative = true })
 			elseif cmd == "w" then
-				ya.mgr_emit("tab_close", { lines - 1 })
+				ya.emit("tab_close", { lines - 1 })
 			elseif cmd == "W" then
 				local curr_tab = get_active_tab()
 				local del_tab = curr_tab + lines - 1
 				for _ = curr_tab, del_tab do
-					ya.mgr_emit("tab_close", { curr_tab - 1 })
+					ya.emit("tab_close", { curr_tab - 1 })
 				end
-				ya.mgr_emit("tab_switch", { curr_tab - 1 })
+				ya.emit("tab_switch", { curr_tab - 1 })
 			elseif cmd == "<" then
-				ya.mgr_emit("tab_swap", { -lines })
+				ya.emit("tab_swap", { -lines })
 			elseif cmd == ">" then
-				ya.mgr_emit("tab_swap", { lines })
+				ya.emit("tab_swap", { lines })
 			elseif cmd == "~" then
 				local jump = lines - get_active_tab()
-				ya.mgr_emit("tab_swap", { jump })
+				ya.emit("tab_swap", { jump })
 			end
 		else
-			ya.mgr_emit("visual_mode", {})
+			ya.emit("visual_mode", {})
 			-- invert direction when user specifies it
 			if direction == "k" then
-				ya.mgr_emit("arrow", { -lines })
+				ya.emit("arrow", { -lines })
 			elseif direction == "j" then
-				ya.mgr_emit("arrow", { lines })
+				ya.emit("arrow", { lines })
 			else
-				ya.mgr_emit("arrow", { lines - 1 })
+				ya.emit("arrow", { lines - 1 })
 			end
-			ya.mgr_emit("escape", {})
+			ya.emit("escape", {})
 
 			if cmd == "d" then
-				ya.mgr_emit("remove", {})
+				ya.emit("remove", {})
 			elseif cmd == "y" then
-				ya.mgr_emit("yank", {})
+				ya.emit("yank", {})
 			elseif cmd == "x" then
-				ya.mgr_emit("yank", { cut = true })
+				ya.emit("yank", { cut = true })
 			end
 		end
 
