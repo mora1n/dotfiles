@@ -1,0 +1,37 @@
+rm() {
+  emulate -L zsh
+  local arg target normalized
+  local -a targets
+  local end_options=0
+
+  command -v realpath >/dev/null 2>&1 || {
+    print -u2 'rm: realpath is required by the deletion guard'
+    return 1
+  }
+
+  for arg in "$@"; do
+    if (( ! end_options )); then
+      if [[ $arg == -- ]]; then
+        end_options=1
+        continue
+      elif [[ $arg == -* && $arg != - ]]; then
+        continue
+      fi
+      end_options=1
+    fi
+    targets+=("$arg")
+  done
+
+  for target in "${targets[@]}"; do
+    normalized=$(realpath -m -- "$target") || {
+      print -u2 "rm: cannot resolve path: $target"
+      return 1
+    }
+    if [[ $normalized != /home/morain/* ]]; then
+      print -u2 "rm: deletion outside /home/morain is blocked: $target"
+      return 1
+    fi
+  done
+
+  command rm "$@"
+}

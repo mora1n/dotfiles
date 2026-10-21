@@ -12,8 +12,11 @@ zmodule fzf --if '[[ -t 0 && -t 1 ]]'
 # Completion definitions must precede completion initialization.
 zmodule zsh-users/zsh-completions --fpath src
 zmodule completion
+zmodule Aloxaf/fzf-tab
 
 # Highlighting and suggestions must follow completion initialization.
 zmodule zdharma-continuum/fast-syntax-highlighting
 zmodule zsh-users/zsh-history-substring-search
 zmodule zsh-users/zsh-autosuggestions
+zmodule lukechilds/zsh-nvm --if '[[ -r $NVM_DIR/nvm.sh ]]'
+zmodule jeffreytse/zsh-vi-mode

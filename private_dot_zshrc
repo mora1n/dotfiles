@@ -10,6 +10,7 @@ ZIM_CONFIG_FILE=$HOME/.config/zsh/.zimrc
 
 typeset -gU path PATH fpath
 path=("$HOME/.local/bin" "$HOME/.cargo/bin" /usr/local/go/bin "${path[@]}")
+fpath=("$HOME/.config/zsh/functions" $fpath)
 [[ -d /usr/share/zsh/site-functions ]] && fpath=(/usr/share/zsh/site-functions $fpath)
 
 export GTK_IM_MODULE=ibus
@@ -19,6 +20,10 @@ export VCPKG_ROOT="$HOME/vcpkg"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export EZA_COLORS='ex=1;32'
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+export NVM_DIR="$HOME/.nvm"
+NVM_LAZY_LOAD=true
+NVM_AUTO_USE=false
+NVM_COMPLETION=false
 
 if [[ -f $HOME/.config/zsh/.dir_colors ]]; then
   local color_init
@@ -74,23 +79,10 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # -- Vi Mode and Cursor ------------------------------------------------------
 
-bindkey -v
-KEYTIMEOUT=1
-autoload -Uz add-zsh-hook add-zle-hook-widget
-
-_set_vi_cursor() {
-  if [[ $KEYMAP == vicmd ]]; then
-    printf '\e[1 q'
-  else
-    printf '\e[5 q'
-  fi
-}
-_set_insert_cursor() { printf '\e[5 q'; }
-
-# Compose with Zim's terminal-mode hooks instead of replacing them.
-add-zle-hook-widget keymap-select _set_vi_cursor
-add-zle-hook-widget line-init _set_insert_cursor
-add-zsh-hook preexec _set_insert_cursor
+ZVM_CURSOR_STYLE_ENABLED=true
+ZVM_INSERT_MODE_CURSOR=$'\e[5 q'
+ZVM_NORMAL_MODE_CURSOR=$'\e[1 q'
+autoload -Uz add-zsh-hook
 
 # -- Selection Widgets -------------------------------------------------------
 
@@ -123,52 +115,60 @@ if (( ${+commands[fzf]} && ${+widgets[fzf-file-widget]} )); then
     export FZF_CTRL_T_OPTS=${FZF_CTRL_T_OPTS// -1F / -1 --classify=always -- }
     export FZF_ALT_C_OPTS=${FZF_ALT_C_OPTS// -1F / -1 --classify=always -- }
   fi
-  for keymap in viins vicmd; do
-    bindkey -M "$keymap" '^T' fzf-file-widget
-    bindkey -M "$keymap" '\ec' fzf-cd-widget
-    bindkey -M "$keymap" '^R' fzf-history-widget
-  done
-  unset keymap
 fi
 
 # -- Key Bindings ------------------------------------------------------------
 
-# History search.
-bindkey -M viins '^[[A' history-substring-search-up
-bindkey -M viins '^[[B' history-substring-search-down
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
+# Key bindings are applied after zsh-vi-mode creates its keymaps.
+_configure_vi_keybindings() {
+  local keymap
+  if (( ${+widgets[fzf-file-widget]} )); then
+    for keymap in viins vicmd; do
+      zvm_bindkey "$keymap" '^T' fzf-file-widget
+      zvm_bindkey "$keymap" '\ec' fzf-cd-widget
+      zvm_bindkey "$keymap" '^R' fzf-history-widget
+    done
+  fi
 
-# Movement clears the active selection.
-bindkey -M viins '^[[C' deselect-forward-char
-bindkey -M viins '^[[D' deselect-backward-char
-bindkey -M viins '^[OC' deselect-forward-char
-bindkey -M viins '^[OD' deselect-backward-char
-bindkey -M viins '^[[1;5C' deselect-forward-word
-bindkey -M viins '^[[1;5D' deselect-backward-word
-bindkey -M viins '^[^[[C' deselect-forward-word
-bindkey -M viins '^[^[[D' deselect-backward-word
-bindkey -M viins '^[[H' deselect-beginning-of-line
-bindkey -M viins '^[[F' deselect-end-of-line
-bindkey -M viins '^[[1~' deselect-beginning-of-line
-bindkey -M viins '^[[4~' deselect-end-of-line
-bindkey -M viins '^A' deselect-beginning-of-line
-bindkey -M viins '^E' deselect-end-of-line
+  zvm_bindkey viins '^[[A' history-substring-search-up
+  zvm_bindkey viins '^[[B' history-substring-search-down
+  zvm_bindkey vicmd 'k' history-substring-search-up
+  zvm_bindkey vicmd 'j' history-substring-search-down
 
-# Delete and backspace.
-bindkey -M viins '^[[3~' delete-char
-bindkey -M viins '^?' backward-delete-char
-bindkey -M viins '^H' backward-delete-char
+  zvm_bindkey viins '^[[C' deselect-forward-char
+  zvm_bindkey viins '^[[D' deselect-backward-char
+  zvm_bindkey viins '^[OC' deselect-forward-char
+  zvm_bindkey viins '^[OD' deselect-backward-char
+  zvm_bindkey viins '^[[1;5C' deselect-forward-word
+  zvm_bindkey viins '^[[1;5D' deselect-backward-word
+  zvm_bindkey viins '^[^[[C' deselect-forward-word
+  zvm_bindkey viins '^[^[[D' deselect-backward-word
+  zvm_bindkey viins '^[[H' deselect-beginning-of-line
+  zvm_bindkey viins '^[[F' deselect-end-of-line
+  zvm_bindkey viins '^[[1~' deselect-beginning-of-line
+  zvm_bindkey viins '^[[4~' deselect-end-of-line
+  [[ -n ${terminfo[khome]} ]] &&
+    zvm_bindkey viins "$terminfo[khome]" deselect-beginning-of-line
+  [[ -n ${terminfo[kend]} ]] &&
+    zvm_bindkey viins "$terminfo[kend]" deselect-end-of-line
+  zvm_bindkey viins '^A' deselect-beginning-of-line
+  zvm_bindkey viins '^E' deselect-end-of-line
 
-# Extend selection by character, word, or line.
-bindkey -M viins '^[[1;2C' visual-select-forward
-bindkey -M viins '^[[1;2D' visual-select-backward
-bindkey -M viins '^[[1;2A' visual-select-up
-bindkey -M viins '^[[1;2B' visual-select-down
-bindkey -M viins '^[[1;6C' visual-select-forward-word
-bindkey -M viins '^[[1;6D' visual-select-backward-word
-bindkey -M viins '^[[1;2H' visual-select-beginning-of-line
-bindkey -M viins '^[[1;2F' visual-select-end-of-line
+  zvm_bindkey viins '^[[3~' delete-char
+  zvm_bindkey viins '^?' backward-delete-char
+  zvm_bindkey viins '^H' backward-delete-char
+
+  zvm_bindkey viins '^[[1;2C' visual-select-forward
+  zvm_bindkey viins '^[[1;2D' visual-select-backward
+  zvm_bindkey viins '^[[1;2A' visual-select-up
+  zvm_bindkey viins '^[[1;2B' visual-select-down
+  zvm_bindkey viins '^[[1;6C' visual-select-forward-word
+  zvm_bindkey viins '^[[1;6D' visual-select-backward-word
+  zvm_bindkey viins '^[[1;2H' visual-select-beginning-of-line
+  zvm_bindkey viins '^[[1;2F' visual-select-end-of-line
+}
+zvm_after_init_commands+=(_configure_vi_keybindings)
+zvm_after_lazy_keybindings_commands+=(_configure_vi_keybindings)
 
 # -- Lazy Tool Initialization ------------------------------------------------
 
@@ -192,65 +192,12 @@ if (( ${+commands[uvx]} && ${+functions[compdef]} )); then
   compdef _uvx_lazy_completion uvx
 fi
 
-export NVM_DIR="$HOME/.nvm"
-if [[ -d $NVM_DIR/versions/node ]]; then
-  local nvm_default nvm_version_path
-  local -a nvm_versions
-  if [[ -r $NVM_DIR/alias/default ]]; then
-    IFS= read -r nvm_default < "$NVM_DIR/alias/default"
-  elif [[ -r $HOME/.nvmrc ]]; then
-    IFS= read -r nvm_default < "$HOME/.nvmrc"
-  fi
-  [[ -n $nvm_default ]] && nvm_versions=("$NVM_DIR/versions/node"/v${~nvm_default}*(Nn))
-  (( ${#nvm_versions} )) || nvm_versions=("$NVM_DIR/versions/node"/v*(Nn))
-  nvm_version_path=${nvm_versions[-1]}
-  [[ -d $nvm_version_path/bin ]] && path=("$nvm_version_path/bin" $path)
-  unset nvm_default nvm_version_path nvm_versions
-fi
-
-nvm() {
-  [[ -s $NVM_DIR/nvm.sh ]] || { print -u2 "Missing NVM: $NVM_DIR/nvm.sh"; return 1; }
-  unset -f nvm
-  source "$NVM_DIR/nvm.sh" || return
-  [[ ! -s $NVM_DIR/bash_completion ]] || source "$NVM_DIR/bash_completion" || return
-  nvm "$@"
-}
-
 # -- Aliases and Functions ---------------------------------------------------
 
 alias ll='eza -l'
 alias la='eza -A'
 alias l='eza --classify=always'
-
-rm() {
-  local arg
-  for arg in "$@"; do
-    if [[ "$arg" =~ ^-.*[rf] ]] && [[ "$*" =~ (^|[[:space:]])/([[:space:]]|$) ]]; then
-      print -u2 'Error: Deletion of root directory is prohibited'
-      return 1
-    fi
-  done
-  command rm "$@"
-}
-
-# Retain Yazi's exit status and always remove its temporary cwd file.
-y() {
-  local cwd_file cwd yazi_exit
-  cwd_file=$(mktemp -t 'yazi-cwd.XXXXXX') || return
-  {
-    env -u NO_COLOR yazi "$@" --cwd-file="$cwd_file"
-    yazi_exit=$?
-    if (( yazi_exit == 0 )) && [[ -s $cwd_file ]]; then
-      cwd=$(<"$cwd_file")
-      if [[ -n $cwd && $cwd != $PWD ]]; then
-        builtin cd -- "$cwd" || return
-      fi
-    fi
-  } always {
-    command rm -f -- "$cwd_file" || return
-  }
-  return $yazi_exit
-}
+autoload -Uz rm y
 
 # -- Prompt and Terminal Integration -----------------------------------------
 

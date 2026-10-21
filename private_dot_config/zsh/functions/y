@@ -1,0 +1,18 @@
+y() {
+  emulate -L zsh
+  local cwd_file cwd yazi_exit
+  cwd_file=$(mktemp -t 'yazi-cwd.XXXXXX') || return
+  {
+    env -u NO_COLOR yazi "$@" --cwd-file="$cwd_file"
+    yazi_exit=$?
+    if (( yazi_exit == 0 )) && [[ -s $cwd_file ]]; then
+      IFS= read -r -d '' cwd < "$cwd_file"
+      if [[ -n $cwd && $cwd != $PWD ]]; then
+        builtin cd -- "$cwd" || return
+      fi
+    fi
+  } always {
+    command rm -f -- "$cwd_file" || return
+  }
+  return $yazi_exit
+}
