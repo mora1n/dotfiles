@@ -2,17 +2,19 @@
 # Zsh Configuration
 # ============================================================================
 
-# -- Environment -------------------------------------------------------------
+# -- Zsh Variables and Environment -------------------------------------------
 
 ZDOTDIR=$HOME
 ZIM_HOME=$HOME/.config/zsh/.zim
 ZIM_CONFIG_FILE=$HOME/.config/zsh/.zimrc
 
+# Command and function search paths.
 typeset -gU path PATH fpath
 path=("$HOME/.local/bin" "$HOME/.cargo/bin" /usr/local/go/bin "${path[@]}")
 fpath=("$HOME/.config/zsh/functions" $fpath)
 [[ -d /usr/share/zsh/site-functions ]] && fpath=(/usr/share/zsh/site-functions $fpath)
 
+# User environment.
 export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
 export XMODIFIERS=@im=ibus
@@ -20,11 +22,17 @@ export VCPKG_ROOT="$HOME/vcpkg"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export EZA_COLORS='ex=1;32'
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+
+# NVM and zsh-vi-mode plugin settings.
 export NVM_DIR="$HOME/.nvm"
 NVM_LAZY_LOAD=true
 NVM_AUTO_USE=false
 NVM_COMPLETION=false
+ZVM_CURSOR_STYLE_ENABLED=true
+ZVM_INSERT_MODE_CURSOR=$'\e[5 q'
+ZVM_NORMAL_MODE_CURSOR=$'\e[1 q'
 
+# GNU dircolors configuration.
 if [[ -f $HOME/.config/zsh/.dir_colors ]]; then
   local color_init
   color_init=$(dircolors -b "$HOME/.config/zsh/.dir_colors") || return
@@ -32,7 +40,7 @@ if [[ -f $HOME/.config/zsh/.dir_colors ]]; then
   unset color_init
 fi
 
-# -- Module Setup ------------------------------------------------------------
+# -- Zim Bootstrap and Plugin Setup ------------------------------------------
 
 typeset -g ZSH_CACHE_DIR=${XDG_CACHE_HOME:-$HOME/.cache}/zsh
 [[ -d $ZSH_CACHE_DIR ]] || command mkdir -p -- "$ZSH_CACHE_DIR" || return
@@ -40,15 +48,11 @@ zstyle ':zim:completion' dumpfile "$ZSH_CACHE_DIR/zcompdump"
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path "$ZSH_CACHE_DIR/zcompcache"
 
-# Autosuggestions bind once, after all custom widgets have been registered.
+# Autosuggestions rebinds after the custom widgets below are registered.
 ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
-  forward-char end-of-line vi-forward-char vi-end-of-line vi-add-eol
-  deselect-forward-char deselect-end-of-line
-)
 
 if [[ ! -r $ZIM_HOME/init.zsh ]]; then
   print -u2 'Zim is not initialized. Run: zsh ~/.config/zsh/bootstrap.zsh'
@@ -56,7 +60,7 @@ if [[ ! -r $ZIM_HOME/init.zsh ]]; then
 fi
 source "$ZIM_HOME/init.zsh" || return
 
-# -- History and Completion --------------------------------------------------
+# -- Zsh Options and Completion ---------------------------------------------
 
 HISTSIZE=1000
 SAVEHIST=1000
@@ -77,14 +81,7 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-# -- Vi Mode and Cursor ------------------------------------------------------
-
-ZVM_CURSOR_STYLE_ENABLED=true
-ZVM_INSERT_MODE_CURSOR=$'\e[5 q'
-ZVM_NORMAL_MODE_CURSOR=$'\e[1 q'
-autoload -Uz add-zsh-hook
-
-# -- Selection Widgets -------------------------------------------------------
+# -- ZLE Widgets -------------------------------------------------------------
 
 _start_selection_if_needed() { [[ $REGION_ACTIVE -eq 0 ]] && zle set-mark-command; }
 
@@ -102,7 +99,13 @@ for pair in forward:forward-char backward:backward-char up:up-line-or-history do
 done
 unset widget pair name
 
-# -- Fuzzy Finder ------------------------------------------------------------
+# Autosuggestions accepts these custom movement widgets as complete commands.
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
+  forward-char end-of-line vi-forward-char vi-end-of-line vi-add-eol
+  deselect-forward-char deselect-end-of-line
+)
+
+# -- Plugin Integrations -----------------------------------------------------
 
 if (( ${+commands[fzf]} && ${+widgets[fzf-file-widget]} )); then
   export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --bind=ctrl-k:kill-line'
@@ -117,9 +120,7 @@ if (( ${+commands[fzf]} && ${+widgets[fzf-file-widget]} )); then
   fi
 fi
 
-# -- Key Bindings ------------------------------------------------------------
-
-# Key bindings are applied after zsh-vi-mode creates its keymaps.
+# zsh-vi-mode recreates keymaps, so plugin and custom bindings are applied here.
 _configure_vi_keybindings() {
   local keymap
   if (( ${+widgets[fzf-file-widget]} )); then
@@ -154,10 +155,6 @@ _configure_vi_keybindings() {
   zvm_bindkey viins '^A' deselect-beginning-of-line
   zvm_bindkey viins '^E' deselect-end-of-line
 
-  zvm_bindkey viins '^[[3~' delete-char
-  zvm_bindkey viins '^?' backward-delete-char
-  zvm_bindkey viins '^H' backward-delete-char
-
   zvm_bindkey viins '^[[1;2C' visual-select-forward
   zvm_bindkey viins '^[[1;2D' visual-select-backward
   zvm_bindkey viins '^[[1;2A' visual-select-up
@@ -170,7 +167,7 @@ _configure_vi_keybindings() {
 zvm_after_init_commands+=(_configure_vi_keybindings)
 zvm_after_lazy_keybindings_commands+=(_configure_vi_keybindings)
 
-# -- Lazy Tool Initialization ------------------------------------------------
+# -- Lazy Completion ---------------------------------------------------------
 
 if (( ${+commands[uv]} && ${+functions[compdef]} )); then
   _uv_lazy_completion() {
@@ -192,14 +189,14 @@ if (( ${+commands[uvx]} && ${+functions[compdef]} )); then
   compdef _uvx_lazy_completion uvx
 fi
 
-# -- Aliases and Functions ---------------------------------------------------
+# -- Aliases and Autoloaded Functions ----------------------------------------
 
 alias ll='eza -l'
 alias la='eza -A'
 alias l='eza --classify=always'
 autoload -Uz rm y
 
-# -- Prompt and Terminal Integration -----------------------------------------
+# -- Prompt and External Integrations ----------------------------------------
 
 local tool_init
 if [[ ${TERM-} != dumb && ${+commands[starship]} ]]; then
@@ -212,6 +209,7 @@ if (( ${+commands[zoxide]} )); then
 fi
 unset tool_init
 
+autoload -Uz add-zsh-hook
 _sync_tmux_graphical_environment() {
   [[ -n ${TMUX-} && -n ${TMUX_PANE-} ]] || return 0
   local tmux_environment
