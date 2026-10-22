@@ -22,6 +22,7 @@ window-save-state = always
 # Mouse and clipboard
 mouse-hide-while-typing = true
 copy-on-select = clipboard
+clipboard-trim-trailing-spaces = true
 clipboard-paste-protection = true
 clipboard-paste-bracketed-safe = true
 
