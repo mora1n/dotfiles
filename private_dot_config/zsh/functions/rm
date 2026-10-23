@@ -27,8 +27,9 @@ rm() {
       print -u2 "rm: cannot resolve path: $target"
       return 1
     }
-    if [[ $normalized != /home/morain/* ]]; then
-      print -u2 "rm: deletion outside /home/morain is blocked: $target"
+    if [[ $normalized != /home/morain/* && \
+          $normalized != /tmp && $normalized != /tmp/* ]]; then
+      print -u2 "rm: deletion outside allowed paths is blocked: $target"
       return 1
     fi
   done
