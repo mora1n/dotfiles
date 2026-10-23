@@ -1,5 +1,4 @@
 "$schema" = 'https://starship.rs/config-schema.json'
-palette = "dracula"
 
 format = """
 $username\
@@ -49,16 +48,3 @@ format = "[$virtualenv]($style) "
 style = "bright-black"
 detect_extensions = []
 detect_files = []
-
-[palettes.dracula]
-pink = "#ff79c6"
-red = "#ff5555"
-yellow = "#f1fa8c"
-green = "#50fa7b"
-blue = "#644ac9"
-purple = "#bd93f9"
-cyan = "#8be9fd"
-comment = "#6272a4"
-base = "#1e1e2e"
-mantle = "#181825"
-crust = "#11111b"
