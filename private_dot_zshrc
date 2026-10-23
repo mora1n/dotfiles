@@ -196,13 +196,9 @@ alias la='eza -A'
 alias l='eza --classify=always'
 autoload -Uz rm y
 
-# -- Prompt and External Integrations ----------------------------------------
+# -- External Integrations --------------------------------------------------
 
 local tool_init
-if [[ ${TERM-} != dumb && ${+commands[starship]} ]]; then
-  tool_init=$(starship init zsh) || return
-  eval "$tool_init" || return
-fi
 if (( ${+commands[zoxide]} )); then
   tool_init=$(zoxide init zsh) || return
   eval "$tool_init" || return

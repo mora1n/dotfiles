@@ -9,6 +9,9 @@ zmodule termtitle
 zmodule utility
 zmodule fzf --if '[[ -t 0 && -t 1 ]]'
 
+# Prompt theme and its bundled asynchronous Git status.
+zmodule dracula/zsh --name dracula --source dracula.zsh-theme
+
 # Completion definitions must precede completion initialization.
 zmodule zsh-users/zsh-completions --fpath src
 zmodule completion
