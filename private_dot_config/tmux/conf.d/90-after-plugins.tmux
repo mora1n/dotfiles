@@ -23,6 +23,10 @@ bind -N "Extract complete lines" y run-shell '~/.config/tmux/plugins/extrakto/sc
 # 状态栏每次刷新即调用,脚本内部按 @continuum-save-interval(30 分钟)判断是否真正保存。
 set -ga status-right "#(~/.config/tmux/plugins/tmux-continuum/scripts/continuum_save.sh)"
 
+# Let tmux update the Ghostty window title from the active pane.
+set -g set-titles on
+set -g set-titles-string '#{pane_current_command}'
+
 # Keep the viewport anchored after keyboard copy actions.
 unbind -T copy-mode-vi M-y
 unbind -T copy-mode M-y
