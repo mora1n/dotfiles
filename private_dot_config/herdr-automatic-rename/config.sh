@@ -1,25 +1,19 @@
 # Keep automatic naming enabled without adding jump-key prefixes.
 NAME_TABS=1
 NAME_PANES=1
-# Publish each agent's task as the sidebar's $topic token.
-PANE_TOPICS=1
+# Keep pane borders available for explicit Herdr agent names such as reviewer.
+PANE_TOPICS=0
 AUTO_INDEX=0
 
-# Make similarly named tabs distinguishable by project and branch.
-TAB_CONTEXT=1
-SHOW_BRANCH=1
+# Keep tabs to the foreground program or shell name.
+TAB_CONTEXT=0
+SHOW_BRANCH=0
 MAX_CONTEXT_LEN=18
 MAX_BRANCH_LEN=18
 MAX_NAME_LEN=20
 
-# Keep agent tabs useful when several agents share one workspace.
-AGENT_TITLES=1
-TITLE_STYLE=name_and_task
-MIN_TASK_LEN=8
-AGENT_TRANSCRIPT=1
-TITLE_CONDENSE=1
-TITLE_CASE=fold
-TITLE_WORD_SEPARATOR=-
+# Keep agent tabs concise: codex, claude, and other foreground agent programs.
+AGENT_TITLES=0
 
 # Keep the compact plain-text style and avoid host tags on local workspaces.
 ICONS_ENABLED=0
