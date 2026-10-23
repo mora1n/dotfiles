@@ -55,7 +55,7 @@ description = "open Sesh workspace picker"
 enabled = true
 
 [ui]
-show_agent_labels_on_pane_borders = false
+show_agent_labels_on_pane_borders = true
 agent_panel_sort = "priority"
 prompt_new_tab_name = false
 pane_borders = "always"
@@ -72,6 +72,7 @@ rows = [
     { token = "state_icon" },
     { token = "agent", fg = "#8be9fd",  dim = false },
   ],
+  [ "$topic" ],
 ]
 
 [theme]
