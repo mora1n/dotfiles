@@ -1,6 +1,8 @@
 # Keep automatic naming enabled without adding jump-key prefixes.
 NAME_TABS=1
 NAME_PANES=1
+# Publish each agent's task as the sidebar's $topic token.
+PANE_TOPICS=1
 AUTO_INDEX=0
 
 # Make similarly named tabs distinguishable by project and branch.
