@@ -9,9 +9,6 @@ zmodule termtitle
 zmodule utility
 zmodule fzf --if '[[ -t 0 && -t 1 ]]'
 
-# Prompt theme and its bundled asynchronous Git status.
-zmodule dracula/zsh --name dracula --source dracula.zsh-theme
-
 # Completion definitions must precede completion initialization.
 zmodule zsh-users/zsh-completions --fpath src
 zmodule completion
@@ -22,4 +19,6 @@ zmodule zsh-users/zsh-history-substring-search
 zmodule zsh-users/zsh-autosuggestions
 zmodule lukechilds/zsh-nvm --if '[[ -r $NVM_DIR/nvm.sh ]]'
 zmodule jeffreytse/zsh-vi-mode
+# Dracula styles must load before the syntax highlighter.
+zmodule dracula/zsh-syntax-highlighting --name dracula-syntax-highlighting --source zsh-syntax-highlighting.sh
 zmodule zsh-users/zsh-syntax-highlighting
