@@ -1,4 +1,4 @@
 .local/bin/tmux-sessionizer
 .config/tmux-sessionizer
 .config/yazi/plugins/relative-motions.yazi
-.config/herdr-automatic-rename/config.sh
+.config/herdr-auto-title/config.env
