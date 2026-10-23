@@ -25,6 +25,44 @@ Neovim configuration is managed by the standalone
 are installed by TPM from the declarations in `40-plugins.tmux`; this repository
 only manages tmux's own configuration and plugin bootstrap script.
 
+Herdr's Auto Title plugin is installed from the latest stable release when its
+chezmoi installer runs. An existing installation with the same release commit
+is reused. The installer replaces Automatic Rename before its old configuration
+is removed. Plugin checkouts and runtime state remain managed by Herdr.
+
+Auto Title polls once per second and names tabs and panes from their project,
+branch, foreground activity, and agent task. The agent sidebar displays each
+pane's generated name on its second row through the `pane` token. Workspace
+topics and tab-number prefixes are disabled. Claude transcript reading is
+enabled for sessions that do not supply a terminal title.
+
+Changing the managed Auto Title configuration restarts the plugin on the next
+full `chezmoi apply`. To apply only its settings and restart it:
+
+```sh
+chezmoi apply --parent-dirs ~/.config/herdr-auto-title/config.env \
+  ~/configure-herdr-auto-title.sh
+```
+
+To restart the plugin manually:
+
+```sh
+herdr plugin action invoke herdr.auto-title.restart
+```
+
+To install a newer stable release, rerun the installer and startup scripts:
+
+```sh
+set -o pipefail
+chezmoi execute-template --file \
+  "$(chezmoi source-path)/run_onchange_before_install-herdr-auto-title.sh.tmpl" | bash
+chezmoi execute-template --file \
+  "$(chezmoi source-path)/run_onchange_after_configure-herdr-auto-title.sh.tmpl" | bash
+```
+
+The first start applies generated names to existing panes. Later manual names
+are preserved; clearing a pane or tab name returns it to automatic naming.
+
 Zim installs Zsh plugins from the managed module declarations. Plugin sources,
 generated initialization files, and compiled completion caches stay local.
 

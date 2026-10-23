@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly plugin_id="herdr.auto-title"
+readonly old_plugin_id="herdr-automatic-rename"
+
+for required_command in awk bash curl git go herdr jq; do
+  if ! command -v "$required_command" >/dev/null 2>&1; then
+    printf 'install-herdr-auto-title: required command not found: %s\n' "$required_command" >&2
+    exit 1
+  fi
+done
+
+release_json=$(curl -fsSL https://api.github.com/repos/kryptamine/herdr-auto-title/releases/latest)
+plugin_ref=$(jq -er 'select(.draft == false and .prerelease == false) | .tag_name' <<<"$release_json")
+plugin_version=${plugin_ref#v}
+plugin_commit=$(git ls-remote --tags https://github.com/kryptamine/herdr-auto-title.git \
+  "refs/tags/$plugin_ref" "refs/tags/$plugin_ref^{}" | awk '
+    /\^\{\}$/ { peeled = $1; next }
+    { direct = $1 }
+    END { print peeled ? peeled : direct }
+  ')
+if [ -z "$plugin_commit" ]; then
+  printf 'install-herdr-auto-title: release tag not found: %s\n' "$plugin_ref" >&2
+  exit 1
+fi
+
+installed_matches_release() {
+  jq -e \
+    --arg id "$plugin_id" --arg version "$plugin_version" \
+    --arg ref "$plugin_ref" --arg commit "$plugin_commit" '
+    [.result.plugins[] | select(.plugin_id == $id)] as $matches
+    | ($matches | length) == 1
+      and $matches[0].enabled
+      and $matches[0].version == $version
+      and $matches[0].source.owner == "kryptamine"
+      and $matches[0].source.repo == "herdr-auto-title"
+      and $matches[0].source.requested_ref == $ref
+      and $matches[0].source.resolved_commit == $commit
+      and any($matches[0].actions[]; .id == "restart")
+  ' <<<"$plugins_json" >/dev/null
+}
+
+plugins_json=$(herdr plugin list --json)
+if ! installed_matches_release; then
+  herdr plugin install kryptamine/herdr-auto-title --ref "$plugin_ref" --yes
+  herdr plugin enable "$plugin_id"
+  plugins_json=$(herdr plugin list --json)
+fi
+
+if ! installed_matches_release; then
+  printf 'install-herdr-auto-title: installed plugin metadata did not match the latest release\n' >&2
+  exit 1
+fi
+
+old_count=$(jq --arg id "$old_plugin_id" \
+  '[.result.plugins[] | select(.plugin_id == $id)] | length' <<<"$plugins_json")
+if [ "$old_count" -gt 0 ]; then
+  herdr plugin disable "$old_plugin_id"
+  pane_ids=$(herdr pane list | jq -r '.result.panes[].pane_id')
+  while IFS= read -r pane_id; do
+    [ -n "$pane_id" ] || continue
+    herdr pane report-metadata "$pane_id" --source "$old_plugin_id" \
+      --clear-title --clear-token topic
+  done <<<"$pane_ids"
+  herdr plugin uninstall "$old_plugin_id"
+fi
+
+# Herdr retains checkout caches on uninstall; existing shells still know this path.
+shopt -s nullglob
+for old_engine in \
+  "$HOME"/.config/herdr/plugins/github-installations/herdr-automatic-rename-*/*/checkout/automatic-rename.sh \
+  "$HOME"/.config/herdr/plugins/github/herdr-automatic-rename-*/automatic-rename.sh; do
+  rm -- "$old_engine"
+  printf 'Removed old shell hook engine: %s\n' "$old_engine"
+done

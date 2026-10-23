@@ -221,11 +221,3 @@ if [[ -n ${TMUX-} && -n ${TMUX_PANE-} ]]; then
   add-zsh-hook preexec _sync_tmux_graphical_environment
   _sync_tmux_graphical_environment
 fi
-
-if [[ -n ${HERDR_PANE_ID-} ]]; then
-  for _har_hook in $HOME/.config/herdr/plugins/github-installations/herdr-automatic-rename-*/*/checkout/shell/hook.zsh(N); do
-    source "$_har_hook"
-    break
-  done
-  unset _har_hook
-fi
