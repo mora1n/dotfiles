@@ -73,7 +73,6 @@ rows = [
     { token = "agent", fg = "#8be9fd",  dim = false },
   ],
   [ "$topic" ],
-  [ "machine", "workspace" ],
 ]
 
 [theme]
