@@ -4,6 +4,10 @@ NAME_PANES=1
 # Publish each agent's task independently for the sidebar.
 PANE_TOPICS=1
 AUTO_INDEX=0
+# Track each workspace's project directory and keep its 1-9 workspace jump prefix.
+AUTO_INDEX_WORKSPACES=1
+AUTO_INDEX_TABS=0
+AUTO_INDEX_AGENTS=0
 
 # Keep directory and branch context out of tab labels.
 TAB_CONTEXT=0

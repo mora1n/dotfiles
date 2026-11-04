@@ -3,29 +3,33 @@
 set -euo pipefail
 
 readonly plugin_id="herdr-automatic-rename"
-release_json=$(curl -fsSL https://api.github.com/repos/qu8n/herdr-automatic-rename/releases/latest)
-plugin_ref=$(jq -er 'select(.draft == false and .prerelease == false) | .tag_name' <<<"$release_json")
-plugin_version=${plugin_ref#v}
 
-for required_command in bash curl git herdr jq; do
+for required_command in bash git herdr jq; do
   if ! command -v "$required_command" >/dev/null 2>&1; then
     printf 'install-herdr-automatic-rename: required command not found: %s\n' "$required_command" >&2
     exit 1
   fi
 done
 
-herdr plugin install qu8n/herdr-automatic-rename --ref "$plugin_ref" --yes
+main_commit=$(git ls-remote https://github.com/qu8n/herdr-automatic-rename.git refs/heads/main | awk 'NF == 2 { print $1; exit }')
+if [[ -z "$main_commit" ]]; then
+  printf 'install-herdr-automatic-rename: could not resolve the upstream main commit\n' >&2
+  exit 1
+fi
+
+herdr plugin install qu8n/herdr-automatic-rename --yes
 plugins_json=$(herdr plugin list --json)
 
 if ! jq -e \
   --arg plugin_id "$plugin_id" \
-  --arg plugin_version "$plugin_version" '
+  --arg main_commit "$main_commit" '
   [.result.plugins[] | select(.plugin_id == $plugin_id)] as $matches
   | ($matches | length) == 1
     and $matches[0].enabled
-    and $matches[0].version == $plugin_version
+    and ($matches[0].source.requested_ref == null)
+    and $matches[0].source.resolved_commit == $main_commit
     and any($matches[0].actions[]; .id == "reset")
 ' <<<"$plugins_json" >/dev/null; then
-  printf 'install-herdr-automatic-rename: installed plugin metadata did not match the latest release\n' >&2
+  printf 'install-herdr-automatic-rename: installed plugin metadata did not match upstream main\n' >&2
   exit 1
 fi
