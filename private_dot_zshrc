@@ -31,6 +31,8 @@ NVM_COMPLETION=false
 ZVM_CURSOR_STYLE_ENABLED=true
 ZVM_INSERT_MODE_CURSOR=$'\e[5 q'
 ZVM_NORMAL_MODE_CURSOR=$'\e[1 q'
+# The default NEX reader mishandles punctuation followed by another key.
+ZVM_READKEY_ENGINE=zle
 
 # GNU dircolors configuration.
 if [[ -f $HOME/.config/zsh/.dir_colors ]]; then
