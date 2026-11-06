@@ -3,11 +3,8 @@
 set -euo pipefail
 
 readonly plugin_id="fullerzz.sesh"
-release_json=$(curl -fsSL https://api.github.com/repos/fullerzz/herdr-plugin-sesh/releases/latest)
-plugin_ref=$(jq -er 'select(.draft == false and .prerelease == false) | .tag_name' <<<"$release_json")
-plugin_version=${plugin_ref#v}
 
-for required_command in curl git go herdr jq; do
+for required_command in git go herdr jq; do
   if ! command -v "$required_command" >/dev/null 2>&1; then
     printf 'install-herdr-sesh: required command not found: %s\n' "$required_command" >&2
     exit 1
@@ -15,18 +12,18 @@ for required_command in curl git go herdr jq; do
 done
 
 export GOTOOLCHAIN=auto
-herdr plugin install fullerzz/herdr-plugin-sesh --ref "$plugin_ref" --yes
+herdr plugin install fullerzz/herdr-plugin-sesh --yes
 plugins_json=$(herdr plugin list --json)
 
 if ! jq -e \
   --arg plugin_id "$plugin_id" \
-  --arg plugin_version "$plugin_version" '
+  '
   [.result.plugins[] | select(.plugin_id == $plugin_id)] as $matches
   | ($matches | length) == 1
     and $matches[0].enabled
-    and $matches[0].version == $plugin_version
+    and ($matches[0].source.requested_ref == null)
     and any($matches[0].actions[]; .id == "open-picker")
 ' <<<"$plugins_json" >/dev/null; then
-  printf 'install-herdr-sesh: installed plugin metadata did not match the latest release\n' >&2
+  printf 'install-herdr-sesh: installed plugin metadata did not track the default branch\n' >&2
   exit 1
 fi

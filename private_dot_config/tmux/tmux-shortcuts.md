@@ -193,4 +193,6 @@ TPM 管理以下插件目录：
 | `prefix + U` | 更新插件 |
 | `prefix + Alt-u` | 清理未配置插件 |
 
+插件更新由 TPM 原生处理；chezmoi 只管理插件声明和 bootstrap 脚本。
+
 Continuum 每 30 分钟调用安全 Resurrect wrapper 保存一次；启动 tmux server 时自动恢复。状态栏位于顶部，Dracula 每 10 秒刷新 SSH、同步输入和时间模块。

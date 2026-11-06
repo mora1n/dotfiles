@@ -5,7 +5,7 @@ _bootstrap_zim() {
   emulate -L zsh
   local ZIM_HOME=${ZIM_HOME:-$HOME/.config/zsh/.zim}
   local ZIM_CONFIG_FILE=${ZIM_CONFIG_FILE:-$HOME/.config/zsh/.zimrc}
-  local zim_version=1.19.1 download_file
+  local download_file
 
   if [[ ! -r $ZIM_CONFIG_FILE ]]; then
     print -u2 "Missing Zim configuration: $ZIM_CONFIG_FILE"
@@ -17,7 +17,7 @@ _bootstrap_zim() {
     download_file=$(mktemp "$ZIM_HOME/zimfw.XXXXXX") || return
     {
       command curl -fsSL \
-        "https://github.com/zimfw/zimfw/releases/download/v${zim_version}/zimfw.zsh" \
+        'https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh' \
         -o "$download_file" || return
       command mv -- "$download_file" "$ZIM_HOME/zimfw.zsh" || return
     } always {

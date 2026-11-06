@@ -45,6 +45,13 @@ Run this again after changing the Zim module declarations, then start a new Zsh
 session. It installs missing modules and rebuilds initialization files without
 updating existing modules. Normal shell startup does not install plugins.
 
+Update the Zim framework and its declared modules with Zim's native commands:
+
+```sh
+zimfw upgrade
+zimfw update
+```
+
 ## Daily workflow
 
 Pull repository updates, review the destination diff, and apply:
@@ -72,10 +79,15 @@ commits are separate steps.
 - SSH configuration and credentials remain machine-local.
 - Neovim configuration lives in the separate
   [`mora1n/nvim`](https://github.com/mora1n/nvim) repository.
-- Zim manages downloaded modules and generated initialization files. TPM manages
-  tmux plugin sources; chezmoi tracks their declarations and bootstrap script.
+- Zim manages downloaded modules and generated initialization files. Use
+  `zimfw upgrade` and `zimfw update` for native Zim maintenance.
+- TPM manages tmux plugin sources; use `prefix + U` to update them. Chezmoi tracks
+  their declarations and bootstrap script.
+- Herdr manages GitHub plugins; use `herdr plugin update --yes`. The configured
+  plugins follow their upstream default branches.
 - Yazi's Easyjump plugin is managed by `ya pkg`; other tracked Yazi plugins and
-  flavors remain in this repository.
+  flavors remain in this repository. Use `ya pkg upgrade` for native package
+  maintenance.
 - Shell caches and Fish universal variables remain local. See `.chezmoiignore`
   for target exclusions.
 
