@@ -50,7 +50,7 @@
 
 `prefix + s` 打开 sesh + fzf popup。当前 pane 的 Git 根目录固定为第一项并默认选中；不在 Git 仓库中时使用当前目录。因此直接按 `Enter` 会创建或切换到当前项目 session。`Ctrl-a/t/g/x/f` 分别显示全部来源、tmux sessions、sesh 配置、zoxide 目录和 `fd` 查找结果，`Ctrl-d` 仅删除选中的 tmux session，`Esc` 取消且不产生副作用。
 
-命令行裸 `gt` 会优先进入最近使用的现有 tmux session；只有一个 session 都没有时，才按当前 Git 根目录创建 session。`gt <directory>` 不显示 popup，直接通过 sesh 创建或切换到指定项目。
+命令行入口是 `gtmux`。不带参数时，如果已有 tmux session，终端外会附着到 tmux server，tmux 内会切换到最近使用的其他 session；没有 session 时，会按当前 Git 根目录创建以目录名命名的新 session。`gtmux <directory>` 会先解析指定目录的 Git 根目录；已有 session 时通过 `sesh connect` 连接或创建对应项目 session，没有 session 时直接创建该项目的 tmux session。
 
 ## Window 管理
 
