@@ -137,6 +137,10 @@ _configure_vi_keybindings() {
 
   zvm_bindkey viins '^[[A' history-substring-search-up
   zvm_bindkey viins '^[[B' history-substring-search-down
+  [[ -n ${terminfo[kcuu1]} ]] &&
+    zvm_bindkey viins "$terminfo[kcuu1]" history-substring-search-up
+  [[ -n ${terminfo[kcud1]} ]] &&
+    zvm_bindkey viins "$terminfo[kcud1]" history-substring-search-down
   zvm_bindkey vicmd 'k' history-substring-search-up
   zvm_bindkey vicmd 'j' history-substring-search-down
 
